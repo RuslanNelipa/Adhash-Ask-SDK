@@ -3,8 +3,7 @@ package org.adhash.sdk.adhashask.utils
 import android.content.Context
 import android.content.res.Configuration
 import android.util.Log
-import org.adhash.sdk.adhashask.network.AdConnection
-import org.adhash.sdk.adhashask.pojo.InfoBody
+import org.adhash.sdk.adhashask.pojo.AdBidderBody
 import org.adhash.sdk.adhashask.pojo.ScreenSize
 import java.util.*
 import android.graphics.Point
@@ -15,15 +14,15 @@ import android.view.WindowManager
 import org.adhash.sdk.adhashask.constants.LibConstants
 import org.adhash.sdk.adhashask.pojo.Navigator
 import org.adhash.sdk.BuildConfig
-import kotlin.collections.ArrayList
+import org.adhash.sdk.adhashask.pojo.AdSizes
 import kotlin.math.sqrt
 
 
 class MakeInfoBodyUtil {
 
-    private val log = AdConnection::class.java.name
+    private val log = MakeInfoBodyUtil::class.java.name
 
-    fun gatherAllInfo(mCtx: Context): InfoBody {
+    fun gatherAllInfo(mCtx: Context): AdBidderBody {
 
         val timeZone = getTimeZone()
         Log.e(log, "Value of TimeZone $timeZone")
@@ -45,7 +44,7 @@ class MakeInfoBodyUtil {
         Log.e(log, "Value of model $model")
         val type = getPhoneType(mCtx)
         Log.e(log, "Value of type $type")
-        val navigator = Navigator(platform, language, device, model, type)
+//        val navigator = Navigator(platform, language, device, model, type)
 
         val connection = getConnectionType(mCtx)
         Log.e(log, "Value of connection $connection")
@@ -55,18 +54,53 @@ class MakeInfoBodyUtil {
 
         val unixTime = getTimeInUnix()
         Log.e(log, "Value of unixTime $unixTime")
-        return InfoBody(timeZone, locationId, null, screenSize, navigator, connection, "...", orientation, "...", ArrayList(), true, ArrayList(), unixTime, ArrayList())
+//        return AdBidderBody(timeZone,
+//            locationId,
+//            null,
+//            screenSize,
+//            navigator,
+//            connection,
+//            "...",
+//            orientation,
+//            "...",
+//            ArrayList(),
+//            true,
+//            ArrayList(),
+//            unixTime,
+//            ArrayList()
+//        )
+
+        return AdBidderBody(
+            timezone = -2,
+            referrer = "",
+            location = "http://publisher.whatismycar.com/",
+            publisherId = "0x89c430444df3dc8329aba2c409770fa196b65d3c",
+            size = ScreenSize(
+                screenWidth = 1366,
+                screenHeight = 768
+            ),
+            navigator = Navigator(
+                platform = "Win32",
+                language = "en",
+                userAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36"
+            ),
+            creatives = arrayListOf(
+                AdSizes(size = "300x250")
+            ),
+            blockedAdvertisers = arrayListOf("0x6a207fd9893bcab1dc9ecb4079c81dc34551ed04"),
+            recentAdvertisers = arrayListOf("0x6a207fd9893bcab1dc9ecb4079c81dc34551ed04")
+        )
 
         // todo get internetID, gpsCoordinates, set PublisherId, blocked Ads, recently Ads
     }
 
     private fun getTimeZone(): Int {
         var timeZone = TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)
-        timeZone = timeZone.substring(3,6)
+        timeZone = timeZone.substring(3, 6)
         return timeZone.toInt()
     }
 
-    private fun getScreenSizes(mCtx: Context) : ScreenSize {
+    private fun getScreenSizes(mCtx: Context): ScreenSize {
         val windowManager = mCtx.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val display = windowManager.defaultDisplay
         val size = Point()
@@ -88,7 +122,7 @@ class MakeInfoBodyUtil {
         }
     }
 
-    private fun getConnectionType(mCtx: Context) : String {
+    private fun getConnectionType(mCtx: Context): String {
         val connMgr = mCtx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val network = connMgr.activeNetwork
@@ -121,40 +155,40 @@ class MakeInfoBodyUtil {
                 }
             }
         } else { todo new method need addition permission*/
-            // delete when minSdkVersion update to 24
-            connMgr.activeNetworkInfo?.let { networkInfo ->
-                if (networkInfo.type == ConnectivityManager.TYPE_WIFI){
-                    return LibConstants.CONNECTION_WIFI
-                } else if (networkInfo.type == ConnectivityManager.TYPE_MOBILE){
-                    when (networkInfo.subtype) {
-                        TelephonyManager.NETWORK_TYPE_1xRTT -> return LibConstants.CONNECTION_1xRTT
-                        TelephonyManager.NETWORK_TYPE_CDMA -> return LibConstants.CONNECTION_CDMA
-                        TelephonyManager.NETWORK_TYPE_EDGE -> return LibConstants.CONNECTION_EDGE
-                        TelephonyManager.NETWORK_TYPE_GPRS -> return LibConstants.CONNECTION_GPRS
-                        TelephonyManager.NETWORK_TYPE_IDEN -> return LibConstants.CONNECTION_IDEN
-                        TelephonyManager.NETWORK_TYPE_GSM -> return LibConstants.CONNECTION_GSM
-                        TelephonyManager.NETWORK_TYPE_EVDO_0 -> return LibConstants.CONNECTION_EVDO_0
-                        TelephonyManager.NETWORK_TYPE_EVDO_A -> return LibConstants.CONNECTION_EVDO_A
-                        TelephonyManager.NETWORK_TYPE_EVDO_B -> return LibConstants.CONNECTION_EVDO_B
-                        TelephonyManager.NETWORK_TYPE_HSDPA -> return LibConstants.CONNECTION_HSDPA
-                        TelephonyManager.NETWORK_TYPE_HSPA -> return LibConstants.CONNECTION_HSPA
-                        TelephonyManager.NETWORK_TYPE_HSPAP -> return LibConstants.CONNECTION_HSPAP
-                        TelephonyManager.NETWORK_TYPE_HSUPA -> return LibConstants.CONNECTION_HSUPA
-                        TelephonyManager.NETWORK_TYPE_UMTS -> return LibConstants.CONNECTION_UMTS
-                        TelephonyManager.NETWORK_TYPE_EHRPD -> return LibConstants.CONNECTION_EHRPD
-                        TelephonyManager.NETWORK_TYPE_TD_SCDMA -> return LibConstants.CONNECTION_TD_SCDMA
-                        TelephonyManager.NETWORK_TYPE_LTE -> return LibConstants.CONNECTION_LTE
-                        TelephonyManager.NETWORK_TYPE_IWLAN -> return LibConstants.CONNECTION_IWLAN
-                        TelephonyManager.NETWORK_TYPE_NR -> return LibConstants.CONNECTION_NR
-                        TelephonyManager.NETWORK_TYPE_UNKNOWN -> return LibConstants.CONNECTION_UNKNOWN
-                    }
+        // delete when minSdkVersion update to 24
+        connMgr.activeNetworkInfo?.let { networkInfo ->
+            if (networkInfo.type == ConnectivityManager.TYPE_WIFI) {
+                return LibConstants.CONNECTION_WIFI
+            } else if (networkInfo.type == ConnectivityManager.TYPE_MOBILE) {
+                when (networkInfo.subtype) {
+                    TelephonyManager.NETWORK_TYPE_1xRTT -> return LibConstants.CONNECTION_1xRTT
+                    TelephonyManager.NETWORK_TYPE_CDMA -> return LibConstants.CONNECTION_CDMA
+                    TelephonyManager.NETWORK_TYPE_EDGE -> return LibConstants.CONNECTION_EDGE
+                    TelephonyManager.NETWORK_TYPE_GPRS -> return LibConstants.CONNECTION_GPRS
+                    TelephonyManager.NETWORK_TYPE_IDEN -> return LibConstants.CONNECTION_IDEN
+                    TelephonyManager.NETWORK_TYPE_GSM -> return LibConstants.CONNECTION_GSM
+                    TelephonyManager.NETWORK_TYPE_EVDO_0 -> return LibConstants.CONNECTION_EVDO_0
+                    TelephonyManager.NETWORK_TYPE_EVDO_A -> return LibConstants.CONNECTION_EVDO_A
+                    TelephonyManager.NETWORK_TYPE_EVDO_B -> return LibConstants.CONNECTION_EVDO_B
+                    TelephonyManager.NETWORK_TYPE_HSDPA -> return LibConstants.CONNECTION_HSDPA
+                    TelephonyManager.NETWORK_TYPE_HSPA -> return LibConstants.CONNECTION_HSPA
+                    TelephonyManager.NETWORK_TYPE_HSPAP -> return LibConstants.CONNECTION_HSPAP
+                    TelephonyManager.NETWORK_TYPE_HSUPA -> return LibConstants.CONNECTION_HSUPA
+                    TelephonyManager.NETWORK_TYPE_UMTS -> return LibConstants.CONNECTION_UMTS
+                    TelephonyManager.NETWORK_TYPE_EHRPD -> return LibConstants.CONNECTION_EHRPD
+                    TelephonyManager.NETWORK_TYPE_TD_SCDMA -> return LibConstants.CONNECTION_TD_SCDMA
+                    TelephonyManager.NETWORK_TYPE_LTE -> return LibConstants.CONNECTION_LTE
+                    TelephonyManager.NETWORK_TYPE_IWLAN -> return LibConstants.CONNECTION_IWLAN
+                    TelephonyManager.NETWORK_TYPE_NR -> return LibConstants.CONNECTION_NR
+                    TelephonyManager.NETWORK_TYPE_UNKNOWN -> return LibConstants.CONNECTION_UNKNOWN
                 }
             }
+        }
 //        }
         return LibConstants.CONNECTION_UNKNOWN
     }
 
-    private fun getOrientationScreen(mCtx: Context): String{
+    private fun getOrientationScreen(mCtx: Context): String {
         when (mCtx.resources.configuration.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> return LibConstants.orientation_landscape
             Configuration.ORIENTATION_PORTRAIT -> return LibConstants.orientation_portrait
