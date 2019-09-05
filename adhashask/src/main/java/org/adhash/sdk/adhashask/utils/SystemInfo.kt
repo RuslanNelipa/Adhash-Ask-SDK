@@ -2,116 +2,144 @@ package org.adhash.sdk.adhashask.utils
 
 import android.content.Context
 import android.content.res.Configuration
-import android.util.Log
-import org.adhash.sdk.adhashask.pojo.AdBidderBody
-import org.adhash.sdk.adhashask.pojo.ScreenSize
 import java.util.*
 import android.graphics.Point
 import android.net.ConnectivityManager
-import android.os.Build
 import android.telephony.TelephonyManager
 import android.view.WindowManager
 import org.adhash.sdk.adhashask.constants.LibConstants
-import org.adhash.sdk.adhashask.pojo.Navigator
-import org.adhash.sdk.BuildConfig
-import org.adhash.sdk.adhashask.pojo.AdSizes
 import kotlin.math.sqrt
 
+private val log = LibConstants.SDK_TAG + SystemInfo::class.java.name
 
-class MakeInfoBodyUtil {
+class SystemInfo(private val context: Context) {
 
-    private val log = MakeInfoBodyUtil::class.java.name
+//    fun gatherAllInfo(): AdBidderBody {
+//
+//        val timeZone = getTimeZone()
+//        Log.e(log, "Value of TimeZone $timeZone")
+//
+//        val locationId = "http://${BuildConfig.APPLICATION_ID}"
+//
+//        Log.e(log, "Value of locationId $locationId")
+//
+//        val screenSize = getScreenSizes(context)
+//        Log.e(log, "Value of screenSize $screenSize")
+//
+//        val platform = "Android API" + Build.VERSION.SDK_INT
+//        Log.e(log, "Value of platform $platform")
+//        val language = Locale.getDefault().language
+//        Log.e(log, "Value of language $language")
+//        val device = Build.BRAND
+//        Log.e(log, "Value of BRAND $device")
+//        val model = Build.MODEL
+//        Log.e(log, "Value of model $model")
+//        val type = getPhoneType(context)
+//        Log.e(log, "Value of type $type")
+////        val navigator = Navigator(platform, language, device, model, type)
+//
+//        val connection = getConnectionType(mCtx)
+//        Log.e(log, "Value of connection $connection")
+//
+//        val orientation = getOrientationScreen(mCtx)
+//        Log.e(log, "Value of orientation $orientation")
+//
+//        val unixTime = getTimeInUnix()
+//        Log.e(log, "Value of unixTime $unixTime")
+////        return AdBidderBody(timeZone,
+////            locationId,
+////            null,
+////            screenSize,
+////            navigator,
+////            connection,
+////            "...",
+////            orientation,
+////            "...",
+////            ArrayList(),
+////            true,
+////            ArrayList(),
+////            unixTime,
+////            ArrayList()
+////        )
 
-    fun gatherAllInfo(mCtx: Context): AdBidderBody {
-
-        val timeZone = getTimeZone()
-        Log.e(log, "Value of TimeZone $timeZone")
-
-        val locationId = "http://${BuildConfig.APPLICATION_ID}"
-
-        Log.e(log, "Value of locationId $locationId")
-
-        val screenSize = getScreenSizes(mCtx)
-        Log.e(log, "Value of screenSize $screenSize")
-
-        val platform = "Android API" + Build.VERSION.SDK_INT
-        Log.e(log, "Value of platform $platform")
-        val language = Locale.getDefault().language
-        Log.e(log, "Value of language $language")
-        val device = Build.BRAND
-        Log.e(log, "Value of BRAND $device")
-        val model = Build.MODEL
-        Log.e(log, "Value of model $model")
-        val type = getPhoneType(mCtx)
-        Log.e(log, "Value of type $type")
-//        val navigator = Navigator(platform, language, device, model, type)
-
-        val connection = getConnectionType(mCtx)
-        Log.e(log, "Value of connection $connection")
-
-        val orientation = getOrientationScreen(mCtx)
-        Log.e(log, "Value of orientation $orientation")
-
-        val unixTime = getTimeInUnix()
-        Log.e(log, "Value of unixTime $unixTime")
-//        return AdBidderBody(timeZone,
-//            locationId,
-//            null,
-//            screenSize,
-//            navigator,
-//            connection,
-//            "...",
-//            orientation,
-//            "...",
-//            ArrayList(),
-//            true,
-//            ArrayList(),
-//            unixTime,
-//            ArrayList()
+//    AdBidderBody(
+//    timezone = -2,
+//    referrer = "",
+//    location = "http://publisher.whatismycar.com/",
+//    publisherId = "0x89c430444df3dc8329aba2c409770fa196b65d3c",
+//    size = ScreenSize(
+//    screenWidth = 1366,
+//    screenHeight = 768
+//    ),
+//    navigator = Navigator(
+//    platform = "Win32",
+//    language = "en",
+//    userAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36",
+//    model = "asd",
+//    type = "mobile"
+//    ),
+//    creatives = arrayListOf(
+//    AdSizes(size = "300x250")
+//    ),
+//    blockedAdvertisers = arrayListOf("0x6a207fd9893bcab1dc9ecb4079c81dc34551ed04"),
+//    recentAdvertisers = arrayListOf("0x6a207fd9893bcab1dc9ecb4079c81dc34551ed04"),
+//    connection = "",
+//    currentTimestamp = 1231231L,
+//    orientation = "",
+//    gps = "",
+//    isp = ""
+//    )
+//
+//        return AdBidderBody(
+//            timezone = -2,
+//            referrer = "",
+//            location = "http://publisher.whatismycar.com/",
+//            publisherId = "0x89c430444df3dc8329aba2c409770fa196b65d3c",
+//            size = ScreenSize(
+//                screenWidth = 1366,
+//                screenHeight = 768
+//            ),
+//            navigator = Navigator(
+//                platform = "Win32",
+//                language = "en",
+//                userAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36"
+//            ),
+//            creatives = arrayListOf(
+//                AdSizes(size = "300x250")
+//            ),
+//            blockedAdvertisers = arrayListOf("0x6a207fd9893bcab1dc9ecb4079c81dc34551ed04"),
+//            recentAdvertisers = arrayListOf("0x6a207fd9893bcab1dc9ecb4079c81dc34551ed04")
 //        )
+//
+//        // todo get internetID, gpsCoordinates, set PublisherId, blocked Ads, recently Ads
+//    }
 
-        return AdBidderBody(
-            timezone = -2,
-            referrer = "",
-            location = "http://publisher.whatismycar.com/",
-            publisherId = "0x89c430444df3dc8329aba2c409770fa196b65d3c",
-            size = ScreenSize(
-                screenWidth = 1366,
-                screenHeight = 768
-            ),
-            navigator = Navigator(
-                platform = "Win32",
-                language = "en",
-                userAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36"
-            ),
-            creatives = arrayListOf(
-                AdSizes(size = "300x250")
-            ),
-            blockedAdvertisers = arrayListOf("0x6a207fd9893bcab1dc9ecb4079c81dc34551ed04"),
-            recentAdvertisers = arrayListOf("0x6a207fd9893bcab1dc9ecb4079c81dc34551ed04")
-        )
-
-        // todo get internetID, gpsCoordinates, set PublisherId, blocked Ads, recently Ads
-    }
-
-    private fun getTimeZone(): Int {
+    fun getTimeZone(): Int {
         var timeZone = TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)
         timeZone = timeZone.substring(3, 6)
         return timeZone.toInt()
     }
 
-    private fun getScreenSizes(mCtx: Context): ScreenSize {
-        val windowManager = mCtx.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    fun getScreenHeight(): Int {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val display = windowManager.defaultDisplay
         val size = Point()
-        display.getSize(size)
-        val width = size.x
-        val height = size.y
-        return ScreenSize(width, height)
+        display?.getSize(size)
+
+        return size.y
     }
 
-    private fun getPhoneType(mCtx: Context): String {
-        val metrics = mCtx.resources.displayMetrics
+    fun getScreenWidth(): Int {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val display = windowManager.defaultDisplay
+        val size = Point()
+        display?.getSize(size)
+
+        return size.x
+    }
+
+    fun getPhoneType(): String {
+        val metrics = context.resources.displayMetrics
         val yInches = metrics.heightPixels / metrics.ydpi
         val xInches = metrics.widthPixels / metrics.xdpi
         val diagonalInches = sqrt((xInches * xInches + yInches * yInches).toDouble())
@@ -122,15 +150,15 @@ class MakeInfoBodyUtil {
         }
     }
 
-    private fun getConnectionType(mCtx: Context): String {
-        val connMgr = mCtx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    fun getConnectionType(): String {
+        val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val network = connMgr.activeNetwork
             val capabilities = connMgr.getNetworkCapabilities(network)
             if (capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)){
                 return LibConstants.CONNECTION_WIFI
             } else if (capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)){
-                val tm = mCtx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                 when(tm.createForSubscriptionId(SubscriptionManager.getDefaultDataSubscriptionId()).dataNetworkType){
                     TelephonyManager.NETWORK_TYPE_1xRTT -> return LibConstants.CONNECTION_1xRTT
                     TelephonyManager.NETWORK_TYPE_CDMA -> return LibConstants.CONNECTION_CDMA
@@ -188,15 +216,15 @@ class MakeInfoBodyUtil {
         return LibConstants.CONNECTION_UNKNOWN
     }
 
-    private fun getOrientationScreen(mCtx: Context): String {
-        when (mCtx.resources.configuration.orientation) {
+    fun getOrientationScreen(): String {
+        when (context.resources.configuration.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> return LibConstants.orientation_landscape
             Configuration.ORIENTATION_PORTRAIT -> return LibConstants.orientation_portrait
         }
         return LibConstants.CONNECTION_UNKNOWN
     }
 
-    private fun getTimeInUnix(): Long {
+    fun getTimeInUnix(): Long {
         val cal = Calendar.getInstance()
         val timeZone = cal.timeZone
         val calDate = Calendar.getInstance(TimeZone.getDefault()).time

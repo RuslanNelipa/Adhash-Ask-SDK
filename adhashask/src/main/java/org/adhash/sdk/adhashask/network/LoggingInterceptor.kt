@@ -1,16 +1,14 @@
 package org.adhash.sdk.adhashask.network
 
 import android.util.Log
-import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.Response
-import okhttp3.internal.http.HttpHeaders
 import okio.Buffer
-import org.adhash.sdk.adhashask.constants.ApiConstants
+import org.adhash.sdk.adhashask.constants.LibConstants
 import java.io.EOFException
 import java.nio.charset.Charset
 
-private val TAG = LoggingInterceptor::class.java.simpleName
+private val TAG = LibConstants.SDK_TAG + LoggingInterceptor::class.java.simpleName
 
 class LoggingInterceptor : Interceptor {
 

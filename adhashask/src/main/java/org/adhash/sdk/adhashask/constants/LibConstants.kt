@@ -1,7 +1,7 @@
 package org.adhash.sdk.adhashask.constants
 
 object LibConstants {
-
+    const val SDK_TAG = "adhashask_sdk"
     const val CONNECTION_WIFI = "WiFi"
 
     const val CONNECTION_1xRTT = "1xRTT-2G"
