@@ -1,0 +1,2 @@
+include ':app', ':adhashask'
+rootProject.name='TestAdHash'
