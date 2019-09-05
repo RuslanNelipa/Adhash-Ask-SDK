@@ -16,8 +16,8 @@ ext {
 
     libraryDescription = 'Adhash Ask SDK'
 
-    siteUrl = 'https://github.com/RuslanNelipa/Adhash-Ask'
-    gitUrl = 'https://github.com/RuslanNelipa/Adhash-Ask.git'
+    siteUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK'
+    gitUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK.git'
 
     libraryVersion = '0.1.0'
 
