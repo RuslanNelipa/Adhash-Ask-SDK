@@ -2,9 +2,10 @@ package org.adhash.sdk.adhashask.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.widget.ImageView
+import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.constants.LibConstants
+import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.AdBidderBody
 import org.adhash.sdk.adhashask.pojo.AdSizes
@@ -17,78 +18,92 @@ private val TAG = LibConstants.SDK_TAG + AdHashView::class.java.simpleName
 class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, attrs) {
 
     private val system = SystemInfo(context)
+    private val gps = GpsManager(context)
     private val apiClient = ApiClient()
 
-    private var adSizeStr: String? = null
+    private lateinit var adBidderBody: AdBidderBody
 
-    private var adBidderBody: AdBidderBody? = null
+    init {
+        buildInitialAdBidder()
+        consumeAttrs(attrs)
+    }
 
-//    init {
-//        adBidderBody = util.gatherAllInfo(context)
-//    }
+    private fun consumeAttrs(attrs: AttributeSet?) {
+        val attributes = context.obtainStyledAttributes(attrs, R.styleable.AdHashView)
+        adBidderBody = adBidderBody.copy(
+            publisherId = attributes.getString(R.styleable.AdHashView_publisherId)
+        )
+        attributes.recycle()
+    }
 
+    /*START VIEW LIFECYCLE*/
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-//        fetchBidder()
+        getCoordinates()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        getViewSize(widthMeasureSpec, heightMeasureSpec)
+        adBidderBody.creatives?.let { getAdSize(widthMeasureSpec, heightMeasureSpec) }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
+    /*END VIEW LIFECYCLE*/
 
-    private fun getViewSize(width: Int, height: Int) {
+    private fun getAdSize(width: Int, height: Int) {
         val widthPixels = MeasureSpec.getSize(width)
         val heightPixels = MeasureSpec.getSize(height)
-        adSizeStr = "${widthPixels}x$heightPixels"
-        Log.d(TAG, "Value of adSizeStr $adSizeStr")
+
+        adBidderBody = adBidderBody.copy(
+            creatives = arrayListOf(
+                AdSizes(size = "${widthPixels}x${heightPixels}")
+            )
+        )
     }
 
-//    fun prepareBanner(publisherId: String) {
-//        // todo get internetID, gpsCoordinates, set PublisherId, blocked Ads, recently Ads
-////        adSizeStr?.let {size ->
-////            AdBidderResponse?.creatives?.add(AdSizes(size))
-////        }
-//        adBidderBody.creatives.add(AdSizes("300x250"))
-//        adBidderBody.publisherId = publisherId
-//    }
+    private fun buildInitialAdBidder() {
+        with(system) {
+            adBidderBody = AdBidderBody(
+                timezone = getTimeZone(),
+                location = getPublishedLocation(),
+                size = ScreenSize(
+                    screenWidth = getScreenWidth(),
+                    screenHeight = getScreenHeight()
+                ),
+                connection = getConnectionType(),
+                currentTimestamp = getTimeInUnix(),
+                orientation = getOrientationScreen(),
+                navigator = Navigator(
+                    platform = getPlatform(),
+                    language = getLanguage(),
+                    userAgent = getUserAgent(),
+                    model = getDeviceName(),
+                    type = getPhoneType()
+                ),
+                isp = getCarrierId()
+            )
+        }
+    }
 
-    private fun fetchBidder(body: AdBidderBody) {
-        apiClient.getAdBidder(body,
+    private fun getCoordinates() {
+        gps.tryGetCoordinates(
             onSuccess = {
+                adBidderBody = adBidderBody.copy(
+                    gps = "${it.first}, ${it.second}"
+                )
+            },
+            doFinally = {
+                fetchBidder()
+            }
+        )
+    }
 
+    private fun fetchBidder() {
+        apiClient.getAdBidder(adBidderBody,
+            onSuccess = {
+                //1st step complete
             },
             onError = {
 
             }
         )
     }
-
-    private fun buildAdBidder() = AdBidderBody(
-        timezone = system.getTimeZone(),
-        referrer = "", //?
-        location = "http://publisher.whatismycar.com/", //where do we get this?
-        publisherId = "0x89c430444df3dc8329aba2c409770fa196b65d3c",
-        size = ScreenSize(
-            screenWidth = system.getScreenWidth(),
-            screenHeight = system.getScreenHeight()
-        ),
-        navigator = Navigator(
-            platform = "Win32",
-            language = "en",
-            userAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36",
-            model = "asd",
-            type = "mobile"
-        ),
-        creatives = arrayListOf(
-            AdSizes(size = "300x250")
-        ),
-        blockedAdvertisers = arrayListOf("0x6a207fd9893bcab1dc9ecb4079c81dc34551ed04"),
-        recentAdvertisers = arrayListOf("0x6a207fd9893bcab1dc9ecb4079c81dc34551ed04"),
-        connection = system.getConnectionType(),
-        currentTimestamp = system.getTimeInUnix(),
-        orientation = system.getOrientationScreen(),
-        gps = "",
-        isp = ""
-    )
 }

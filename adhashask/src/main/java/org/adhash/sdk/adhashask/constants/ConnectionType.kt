@@ -1,9 +1,10 @@
 package org.adhash.sdk.adhashask.constants
 
-object LibConstants {
-    const val SDK_TAG = "adhashask_sdk"
-    const val CONNECTION_WIFI = "WiFi"
-    const val CONNECTION_CELULLAR = "WiFi"
+object ConnectionType {
+    const val TRANSPORT_WIFI = "WiFi"
+    const val TRANSPORT_CELULLAR = "Cellular"
+    const val TRANSPORT_ETHERNET = "Ethernet"
+    const val TRANSPORT_BLUETOOTH = "Bluetooth"
 
     const val CONNECTION_1xRTT = "1xRTT-2G"
     const val CONNECTION_CDMA = "CDMA-2G"
@@ -29,10 +30,4 @@ object LibConstants {
     const val CONNECTION_NR = "NR-5G"
 
     const val CONNECTION_UNKNOWN = "UNKNOWN"
-
-    const val orientation_landscape = "landscape"
-    const val orientation_portrait = "portrait"
-
-    const val mobile = "mobile"
-    const val tablet = "tablet"
 }
