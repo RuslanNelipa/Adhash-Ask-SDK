@@ -124,7 +124,7 @@ class SystemInfo(private val context: Context) {
     fun getPublishedLocation() =
         "https://play.google.com/store/apps/details?id=${context.packageName}" //todo pull parent package name
 
-    fun getPlatform() = "Android ${getVersionName()} API ${getVersionCode()}"
+    fun getPlatform() = "Android API ${getVersionCode()}"
 
     fun getUserAgent() = System.getProperty("http.agent") ?: ""
 
@@ -165,21 +165,6 @@ class SystemInfo(private val context: Context) {
         return phrase.toString()
     }
 
-    private fun getVersionName() = try {
-        context.packageManager.getPackageInfo(context.packageName, 0).versionName
-    } catch (e: PackageManager.NameNotFoundException) {
-        null
-    }
 
-    private fun getVersionCode() = try {
-        context.packageManager.getPackageInfo(context.packageName, 0).run {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                versionCode.toString()
-            } else {
-                longVersionCode.toString()
-            }
-        }
-    } catch (e: PackageManager.NameNotFoundException) {
-        null
-    }
+    private fun getVersionCode() = Build.VERSION.SDK_INT
 }
