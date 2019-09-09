@@ -15,7 +15,6 @@ import android.text.TextUtils
 import android.net.NetworkCapabilities
 import org.adhash.sdk.adhashask.constants.ConnectionType
 
-
 private val TAG = LibConstants.SDK_TAG + SystemInfo::class.java.name
 
 class SystemInfo(private val context: Context) {
@@ -183,5 +182,4 @@ class SystemInfo(private val context: Context) {
     } catch (e: PackageManager.NameNotFoundException) {
         null
     }
-
 }

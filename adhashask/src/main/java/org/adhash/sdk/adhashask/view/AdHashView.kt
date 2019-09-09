@@ -90,6 +90,9 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
                     gps = "${it.first}, ${it.second}"
                 )
             },
+            onError = {
+                fetchBidder()
+            },
             doFinally = {
                 fetchBidder()
             }
