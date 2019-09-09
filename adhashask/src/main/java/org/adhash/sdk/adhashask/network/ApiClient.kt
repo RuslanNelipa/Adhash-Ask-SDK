@@ -9,6 +9,7 @@ import org.adhash.sdk.adhashask.pojo.ApiError
 import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.pojo.AdBidderBody
 import org.adhash.sdk.adhashask.pojo.AdBidderResponse
+import org.adhash.sdk.adhashask.pojo.ApiErrorCase
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,13 +18,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 private val TAG = Global.SDK_TAG + ApiClient::class.java.simpleName
 
-class ApiClient {
+class ApiClient(baseUrl: String = ApiConstants.API_BASE_URL) {
+
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(LoggingInterceptor())
         .build()
 
     private val apiEndpoint = Retrofit.Builder()
-        .baseUrl(ApiConstants.API_BASE_URL)
+        .baseUrl(baseUrl)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
         .build()
@@ -53,7 +55,11 @@ class ApiClient {
             ) {
                 response.body()?.let { adBidder ->
                     Log.d(TAG, "Ad Bidder received: $adBidder")
-                    onSuccess(adBidder)
+                    if (adBidder.creatives.isNullOrEmpty()){
+                        onError(ApiError(ApiErrorCase.BadRequest, requestPath = getRequestPath(call)))
+                    } else {
+                        onSuccess(adBidder)
+                    }
 
                 } ?: run {
                     val httpError = errorHandler.consumeError(response, getRequestPath(call))

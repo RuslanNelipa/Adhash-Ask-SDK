@@ -1,6 +1,7 @@
 package org.adhash.sdk.adhashask.view
 
 import android.content.Context
+import android.graphics.Canvas
 import android.util.AttributeSet
 import android.widget.ImageView
 import org.adhash.sdk.R
@@ -22,22 +23,27 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     }
 
     /*START VIEW LIFECYCLE*/
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        vm.onAttached()
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        vm.setBidderProperty(
+            creatives = arrayListOf(
+                AdSizes(
+                    size = "${MeasureSpec.getSize(widthMeasureSpec)}" +
+                            "x" +
+                            "${MeasureSpec.getSize(heightMeasureSpec)}"
+                )
+            )
+        )
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    }
+
+    override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
+        vm.onViewDisplayed()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        vm.onDetached()
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val widthPixels = MeasureSpec.getSize(width)
-        val heightPixels = MeasureSpec.getSize(height)
-
-        vm.setBidderProperty(creatives = arrayListOf(AdSizes(size = "${widthPixels}x${heightPixels}")))
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        vm.onViewDetached()
     }
     /*END VIEW LIFECYCLE*/
 

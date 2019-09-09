@@ -4,10 +4,7 @@ import android.util.Log
 import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
-import org.adhash.sdk.adhashask.pojo.AdBidderBody
-import org.adhash.sdk.adhashask.pojo.AdSizes
-import org.adhash.sdk.adhashask.pojo.Navigator
-import org.adhash.sdk.adhashask.pojo.ScreenSize
+import org.adhash.sdk.adhashask.pojo.*
 import org.adhash.sdk.adhashask.utils.SystemInfo
 
 private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
@@ -15,7 +12,7 @@ private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
 class AdHashVm(
     systemInfo: SystemInfo,
     private val gpsManager: GpsManager,
-    private val apiClient: ApiClient
+    private var apiClient: ApiClient
 ) {
     private val adBidderBody = AdBidderBody()
 
@@ -37,13 +34,13 @@ class AdHashVm(
         }
     }
 
-    fun onAttached() {
+    fun onViewDisplayed() {
         Log.d(TAG, "View attached")
 
         getCoordinates()
     }
 
-    fun onDetached() {
+    fun onViewDetached() {
         Log.d(TAG, "View detached")
 
     }
@@ -68,6 +65,7 @@ class AdHashVm(
                     type = getPhoneType()
                 )
                 isp = getCarrierId()
+//                recentAdvertisers = adsStorage.getRecentAds() //todo
             }
         }
         Log.d(TAG, "Initial bidder creation complete")
@@ -90,14 +88,48 @@ class AdHashVm(
         Log.d(TAG, "Fetching bidder AD")
 
         apiClient.getAdBidder(adBidderBody,
-            onSuccess = {
-                Log.d(TAG, "Fetching bidder received")
+            onSuccess = { adBidderResponse ->
+                Log.d(TAG, "Fetching bidder received: $adBidderBody")
+                callAdvertiserUrl(adBidderBody, adBidderResponse)
 
             },
             onError = { error ->
                 Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}")
-
             }
         )
     }
+
+    private fun callAdvertiserUrl(adBidderBody: AdBidderBody, adBidderResponse: AdBidderResponse) {
+        val creatives = adBidderResponse.creatives?.firstOrNull()
+
+        creatives?.run {
+            val body = AdvertiserBody(
+                expectedHashes = expectedHashes,
+                budgetId = budgetId,
+                period = adBidderResponse.period,
+                nonce = adBidderResponse.nonce,
+                timezone = adBidderBody.timezone,
+                location = adBidderBody.location,
+                publisherId = adBidderBody.publisherId,
+                size = adBidderBody.size,
+                navigator = adBidderBody.navigator,
+                connection = adBidderBody.connection,
+                isp = adBidderBody.connection,
+                orientation = adBidderBody.orientation,
+                gps = adBidderBody.gps,
+                creatives = adBidderBody.creatives,
+                mobile = adBidderBody.mobile,
+                blockedAdvertisers = adBidderBody.blockedAdvertisers,
+                currentTimestamp = adBidderBody.currentTimestamp
+//            recentAds = adsStorage.getRecentAds() //todo
+            )
+
+            apiClient = ApiClient(baseUrl = advertiserURL)
+//            apiClient.callAdvertiserUrl(body) //todo
+
+        } ?: run {
+            Log.e(TAG, "Creatives are null")
+        }
+    }
+
 }

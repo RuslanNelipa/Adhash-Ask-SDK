@@ -16,4 +16,22 @@ data class AdBidderBody(
     var creatives: ArrayList<AdSizes>? = null,
     var blockedAdvertisers: ArrayList<String>? = null,
     var recentAdvertisers: ArrayList<String>? = null
-)
+) {
+    override fun toString(): String {
+        return "AdBidderBody(timezone=$timezone, " +
+                "location=$location, " +
+                "publisherId=$publisherId, " +
+                "size=$size," +
+                " referrer=$referrer," +
+                " navigator=$navigator," +
+                " connection=$connection," +
+                " isp=$isp," +
+                " orientation=$orientation," +
+                " gps=$gps," +
+                " mobile=$mobile," +
+                " currentTimestamp=$currentTimestamp," +
+                " creatives=$creatives," +
+                " blockedAdvertisers=$blockedAdvertisers," +
+                " recentAdvertisers=$recentAdvertisers)"
+    }
+}
