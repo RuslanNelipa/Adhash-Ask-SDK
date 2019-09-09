@@ -84,6 +84,7 @@ class AdHashVm(
         )
     }
 
+    /*STEP 1*/
     private fun fetchBidder() {
         Log.d(TAG, "Fetching bidder AD")
 
@@ -99,6 +100,7 @@ class AdHashVm(
         )
     }
 
+    /*STEP 3*/
     private fun callAdvertiserUrl(adBidderBody: AdBidderBody, adBidderResponse: AdBidderResponse) {
         val creatives = adBidderResponse.creatives?.firstOrNull()
 
