@@ -1,4 +1,4 @@
-package org.adhash.sdk.adhashask.constants
+package org.adhash.sdk.adhashask.pojo
 
 data class ApiError(
     val errorCase : ApiErrorCase,

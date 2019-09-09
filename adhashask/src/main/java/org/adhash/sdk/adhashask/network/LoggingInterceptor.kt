@@ -4,11 +4,11 @@ import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
 import okio.Buffer
-import org.adhash.sdk.adhashask.constants.LibConstants
+import org.adhash.sdk.adhashask.constants.Global
 import java.io.EOFException
 import java.nio.charset.Charset
 
-private val TAG = LibConstants.SDK_TAG + LoggingInterceptor::class.java.simpleName
+private val TAG = Global.SDK_TAG + LoggingInterceptor::class.java.simpleName
 
 class LoggingInterceptor : Interceptor {
 

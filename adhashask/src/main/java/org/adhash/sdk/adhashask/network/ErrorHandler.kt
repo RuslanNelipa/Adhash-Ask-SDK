@@ -2,8 +2,8 @@ package org.adhash.sdk.adhashask.network
 
 import com.google.gson.JsonSyntaxException
 import org.adhash.sdk.adhashask.base.BaseResponse
-import org.adhash.sdk.adhashask.constants.ApiError
-import org.adhash.sdk.adhashask.constants.ApiErrorCase
+import org.adhash.sdk.adhashask.pojo.ApiError
+import org.adhash.sdk.adhashask.pojo.ApiErrorCase
 import retrofit2.HttpException
 import retrofit2.Response
 import java.net.SocketTimeoutException
@@ -29,7 +29,7 @@ class ErrorHandler {
         )
     }
 
-    fun consumeError(response: Response<out BaseResponse>, requestPath: String): ApiError{
+    fun consumeError(response: Response<out BaseResponse>, requestPath: String): ApiError {
         //todo parse HttpErrors
         return ApiError(
             errorCase = ApiErrorCase.Unknown,

@@ -5,8 +5,8 @@ import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import org.adhash.sdk.adhashask.base.BaseResponse
 import org.adhash.sdk.adhashask.constants.ApiConstants
-import org.adhash.sdk.adhashask.constants.ApiError
-import org.adhash.sdk.adhashask.constants.LibConstants
+import org.adhash.sdk.adhashask.pojo.ApiError
+import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.pojo.AdBidderBody
 import org.adhash.sdk.adhashask.pojo.AdBidderResponse
 import retrofit2.Call
@@ -15,7 +15,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-private val TAG = LibConstants.SDK_TAG + ApiClient::class.java.simpleName
+private val TAG = Global.SDK_TAG + ApiClient::class.java.simpleName
 
 class ApiClient {
     private val okHttpClient = OkHttpClient.Builder()

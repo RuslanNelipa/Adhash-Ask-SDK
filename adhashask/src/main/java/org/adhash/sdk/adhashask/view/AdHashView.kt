@@ -4,13 +4,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.ImageView
 import org.adhash.sdk.R
-import org.adhash.sdk.adhashask.constants.LibConstants
 import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.AdSizes
 import org.adhash.sdk.adhashask.utils.SystemInfo
 
-private val TAG = LibConstants.SDK_TAG + AdHashView::class.java.simpleName
 
 class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, attrs) {
     private val vm = AdHashVm(

@@ -1,21 +1,22 @@
 package org.adhash.sdk.adhashask.utils
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.content.res.Configuration
-import java.util.*
 import android.graphics.Point
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.telephony.TelephonyManager
-import android.view.WindowManager
-import org.adhash.sdk.adhashask.constants.LibConstants
-import kotlin.math.sqrt
 import android.text.TextUtils
-import android.net.NetworkCapabilities
+import android.view.WindowManager
 import org.adhash.sdk.adhashask.constants.ConnectionType
+import org.adhash.sdk.adhashask.constants.DeviceType
+import org.adhash.sdk.adhashask.constants.Global
+import org.adhash.sdk.adhashask.constants.Orientation
+import java.util.*
+import kotlin.math.sqrt
 
-private val TAG = LibConstants.SDK_TAG + SystemInfo::class.java.name
+private val TAG = Global.SDK_TAG + SystemInfo::class.java.name
 
 class SystemInfo(private val context: Context) {
 
@@ -49,9 +50,9 @@ class SystemInfo(private val context: Context) {
         val xInches = metrics.widthPixels / metrics.xdpi
         val diagonalInches = sqrt((xInches * xInches + yInches * yInches).toDouble())
         return if (diagonalInches >= 6.5) {
-            LibConstants.tablet
+            DeviceType.TABLET
         } else {
-            LibConstants.mobile
+            DeviceType.MOBILE
         }
     }
 
@@ -69,7 +70,7 @@ class SystemInfo(private val context: Context) {
                     hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> ConnectionType.TRANSPORT_CELULLAR
                     hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> ConnectionType.TRANSPORT_ETHERNET
                     hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> ConnectionType.TRANSPORT_BLUETOOTH
-                    else -> LibConstants.CONNECTION_UNKNOWN
+                    else -> ConnectionType.CONNECTION_UNKNOWN
                 }
             } ?: ConnectionType.CONNECTION_UNKNOWN
         } else {
@@ -105,11 +106,11 @@ class SystemInfo(private val context: Context) {
     }
 
     fun getOrientationScreen(): String {
-        when (context.resources.configuration.orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> return LibConstants.orientation_landscape
-            Configuration.ORIENTATION_PORTRAIT -> return LibConstants.orientation_portrait
+        return when (context.resources.configuration.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> Orientation.LANDSCAPE
+            Configuration.ORIENTATION_PORTRAIT -> Orientation.PORTRAIT
+            else -> ConnectionType.CONNECTION_UNKNOWN
         }
-        return LibConstants.CONNECTION_UNKNOWN
     }
 
     fun getTimeInUnix(): Long {
