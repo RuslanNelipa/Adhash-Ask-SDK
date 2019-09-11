@@ -6,7 +6,7 @@ class AdvertiserBody(
     var blockedAdvertisers: List<Any?>? = null,
     var period: Int? = null,
     var expectedHashes: List<String?>? = null,
-    var recentAds: List<List<Int?>?>? = null,
+    var recentAds: List<List<RecentAd>?>? = null,
     var timezone: Int? = null,
     var isp: String? = null,
     var navigator: Navigator? = null,

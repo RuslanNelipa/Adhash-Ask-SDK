@@ -2,6 +2,7 @@ package org.adhash.sdk.adhashask.constants
 
 object ApiConstants {
     const val API_BASE_URL = "https://bidder.adhash.org"
+    const val STATUS_OK = "OK"
 
     object Endpoint {
         const val GET_AD_BIDDER = "/protocol.php"

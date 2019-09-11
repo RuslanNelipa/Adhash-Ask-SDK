@@ -15,7 +15,7 @@ data class AdBidderBody(
     var currentTimestamp: Long? = null,
     var creatives: ArrayList<AdSizes>? = null,
     var blockedAdvertisers: ArrayList<String>? = null,
-    var recentAdvertisers: ArrayList<String>? = null
+    var recentAdvertisers: List<List<RecentAd>?>? = null
 ) {
     override fun toString(): String {
         return "AdBidderBody(timezone=$timezone, " +

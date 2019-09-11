@@ -8,6 +8,7 @@ import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.AdSizes
+import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.SystemInfo
 
 
@@ -15,6 +16,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     private val vm = AdHashVm(
         systemInfo = SystemInfo(context),
         gpsManager = GpsManager(context),
+        adsStorage = AdsStorage(context),
         apiClient = ApiClient()
     )
 

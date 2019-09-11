@@ -2,9 +2,11 @@ package org.adhash.sdk.adhashask.view
 
 import android.util.Log
 import org.adhash.sdk.adhashask.constants.Global
+import org.adhash.sdk.adhashask.ext.safeLet
 import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.*
+import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.SystemInfo
 
 private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
@@ -12,6 +14,7 @@ private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
 class AdHashVm(
     systemInfo: SystemInfo,
     private val gpsManager: GpsManager,
+    private val adsStorage: AdsStorage,
     private var apiClient: ApiClient
 ) {
     private val adBidderBody = AdBidderBody()
@@ -65,7 +68,7 @@ class AdHashVm(
                     type = getPhoneType()
                 )
                 isp = getCarrierId()
-//                recentAdvertisers = adsStorage.getRecentAds() //todo
+                recentAdvertisers = listOf(adsStorage.getAllRecentAds())
             }
         }
         Log.d(TAG, "Initial bidder creation complete")
@@ -104,10 +107,13 @@ class AdHashVm(
     private fun callAdvertiserUrl(adBidderBody: AdBidderBody, adBidderResponse: AdBidderResponse) {
         val creatives = adBidderResponse.creatives?.firstOrNull()
 
-        creatives?.run {
+        safeLet(
+            creatives?.advertiserURL,
+            creatives?.expectedHashes
+        ) { advertiserURL, expectedHashes ->
             val body = AdvertiserBody(
                 expectedHashes = expectedHashes,
-                budgetId = budgetId,
+                budgetId = creatives?.budgetId,
                 period = adBidderResponse.period,
                 nonce = adBidderResponse.nonce,
                 timezone = adBidderBody.timezone,
@@ -122,12 +128,20 @@ class AdHashVm(
                 creatives = adBidderBody.creatives,
                 mobile = adBidderBody.mobile,
                 blockedAdvertisers = adBidderBody.blockedAdvertisers,
-                currentTimestamp = adBidderBody.currentTimestamp
-//            recentAds = adsStorage.getRecentAds() //todo
+                currentTimestamp = adBidderBody.currentTimestamp,
+                recentAds = listOf(adsStorage.getAllRecentAds())
             )
 
-            apiClient = ApiClient(baseUrl = advertiserURL)
-//            apiClient.callAdvertiserUrl(body) //todo
+            apiClient.callAdvertiserUrl(advertiserURL, body,
+                onSuccess = { advertiser ->
+                    Log.d(TAG, "Advertiser received: $advertiser")
+                    //todo step 5 encryptor.checkIfExpected(advertiser.data, expectedHashes)
+
+                },
+                onError = { error ->
+                    Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}")
+                }
+            )
 
         } ?: run {
             Log.e(TAG, "Creatives are null")
