@@ -134,6 +134,7 @@ class AdHashVm(
 
             apiClient.callAdvertiserUrl(advertiserURL, body,
                 onSuccess = { advertiser ->
+                    /*STEP 4*/
                     Log.d(TAG, "Advertiser received: $advertiser")
                     //todo step 5 encryptor.checkIfExpected(advertiser.data, expectedHashes)
 

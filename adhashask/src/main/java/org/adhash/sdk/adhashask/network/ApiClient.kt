@@ -5,6 +5,7 @@ import org.adhash.sdk.adhashask.base.BaseResponse
 import org.adhash.sdk.adhashask.constants.ApiConstants
 import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.ext.createRetrofit
+import org.adhash.sdk.adhashask.ext.extractBaseUrl
 import org.adhash.sdk.adhashask.pojo.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -16,8 +17,7 @@ class ApiClient {
     private val errorHandler = ErrorHandler()
 
     fun getAdBidder(body: AdBidderBody, onSuccess: (AdBidderResponse) -> Unit, onError: (ApiError) -> Unit) {
-        ApiConstants.API_BASE_URL
-            .createRetrofit<AdHashApi>()
+        ApiConstants.API_BASE_URL.createRetrofit<AdHashApi>()
             .getAdBidder(bodyAd = body, action = ApiConstants.Query.RTB, version = ApiConstants.Query.VERSION)
             .enqueue(object : Callback<AdBidderResponse> {
                 override fun onFailure(call: Call<AdBidderResponse>, error: Throwable) {
@@ -45,9 +45,8 @@ class ApiClient {
     }
 
     fun callAdvertiserUrl(advertiserUrl: String, body: AdvertiserBody, onSuccess: (AdvertiserResponse) -> Unit, onError: (ApiError) -> Unit) {
-        advertiserUrl
-            .createRetrofit<AdvertiserApi>()
-            .callAdvertiserUrl(body).enqueue(object : Callback<AdvertiserResponse> {
+        advertiserUrl.extractBaseUrl().createRetrofit<AdvertiserApi>()
+            .callAdvertiserUrl(advertiserUrl,body).enqueue(object : Callback<AdvertiserResponse> {
                 override fun onFailure(call: Call<AdvertiserResponse>, error: Throwable) {
                     val apiError = errorHandler.consumeThrowable(error, getRequestPath(call))
                     Log.e(TAG, "API call exception:  $error")
@@ -70,6 +69,7 @@ class ApiClient {
                     }
                 }
             })
+
     }
 
     private fun getRequestPath(call: Call<out BaseResponse>) = call.request().url().encodedPath()

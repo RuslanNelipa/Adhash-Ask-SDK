@@ -5,8 +5,12 @@ import org.adhash.sdk.adhashask.pojo.AdvertiserResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Url
 
 interface AdvertiserApi {
     @POST
-    fun callAdvertiserUrl(@Body advertiserBody: AdvertiserBody): Call<AdvertiserResponse>
+    fun callAdvertiserUrl(
+        @Url url: String,
+        @Body advertiserBody: AdvertiserBody
+    ): Call<AdvertiserResponse>
 }

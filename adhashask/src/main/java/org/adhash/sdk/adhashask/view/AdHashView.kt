@@ -35,6 +35,14 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
                 )
             )
         )
+
+        vm.setBidderProperty( //todo remove. It's for tests
+            creatives = arrayListOf(
+                AdSizes(
+                    size = "300x250"
+                )
+            )
+        )
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
