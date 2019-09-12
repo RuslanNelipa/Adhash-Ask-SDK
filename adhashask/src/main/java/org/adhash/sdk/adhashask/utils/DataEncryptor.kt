@@ -5,7 +5,7 @@ import java.security.MessageDigest
 
 class DataEncryptor {
 
-    fun checkIfAdExpected(data: String, expectedHashes: ArrayList<String>) = sha1(data).run { expectedHashes.contains(this) }
+    fun checkIfAdExpected(data: String, expectedHashes: ArrayList<String>) = sha1(data).let(expectedHashes::contains)
 
     private fun sha1(target: String) = MessageDigest
         .getInstance("SHA-1")
