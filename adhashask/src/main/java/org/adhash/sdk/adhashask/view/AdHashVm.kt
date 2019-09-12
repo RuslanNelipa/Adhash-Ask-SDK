@@ -7,6 +7,7 @@ import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.*
 import org.adhash.sdk.adhashask.storage.AdsStorage
+import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
 
 private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
@@ -15,7 +16,8 @@ class AdHashVm(
     systemInfo: SystemInfo,
     private val gpsManager: GpsManager,
     private val adsStorage: AdsStorage,
-    private var apiClient: ApiClient
+    private var apiClient: ApiClient,
+    private var dataEncryptor: DataEncryptor
 ) {
     private val adBidderBody = AdBidderBody()
 
@@ -136,7 +138,7 @@ class AdHashVm(
                 onSuccess = { advertiser ->
                     /*STEP 4*/
                     Log.d(TAG, "Advertiser received: $advertiser")
-                    //todo step 5 encryptor.checkIfExpected(advertiser.data, expectedHashes)
+                    verifyHashes(advertiser, expectedHashes)
 
                 },
                 onError = { error ->
@@ -149,4 +151,10 @@ class AdHashVm(
         }
     }
 
+    private fun verifyHashes(advertiser: AdvertiserResponse, expectedHashes: ArrayList<String>) {
+        /*STEP 5*/
+        if (!dataEncryptor.checkIfAdExpected(advertiser.data, expectedHashes)) return
+
+        //todo do step 6 -> dataEncryptor.extractImage(advertiser.data)
+    }
 }
