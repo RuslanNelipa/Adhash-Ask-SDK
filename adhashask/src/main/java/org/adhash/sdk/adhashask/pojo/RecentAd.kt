@@ -1,8 +1,8 @@
 package org.adhash.sdk.adhashask.pojo
 
 data class RecentAd(
-    val timestamp: Int,
+    val timestamp: Long,
     val advertiserId: String,
-    val advertiserCampaignId: Int,
+    val campaignId: Int,
     val adId: String
 )

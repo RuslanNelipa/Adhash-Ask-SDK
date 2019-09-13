@@ -10,23 +10,22 @@ import org.adhash.sdk.adhashask.pojo.*
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
-import kotlin.collections.ArrayList
 
 private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
 
 class AdHashVm(
-    systemInfo: SystemInfo,
+    private val systemInfo: SystemInfo,
     private val gpsManager: GpsManager,
     private val adsStorage: AdsStorage,
     private var apiClient: ApiClient,
-    private var dataEncryptor: DataEncryptor
+    private val dataEncryptor: DataEncryptor
 ) {
     private val adBidderBody = AdBidderBody()
+    private var builderStatesList = mutableListOf<InfoBuildState>()
+    private var completeBuilderState = InfoBuildState.values().asList()
 
-    private var statesList = mutableListOf<InfoBuildState>()
-    private var finalBuilderState = InfoBuildState.values().asList()
-
-    private lateinit var onBitmapReceived: (bmp: Bitmap) -> Unit
+    private lateinit var onBitmapReceived: (bmp: Bitmap, recentAd: RecentAd) -> Unit
+    private lateinit var onError: (reason: String) -> Unit
 
     enum class InfoBuildState {
         PublisherId, Gps, Creatives
@@ -53,24 +52,31 @@ class AdHashVm(
         }
     }
 
-    fun onAttachedToWindow(onBitmapReceived: (bmp: Bitmap) -> Unit) {
+    fun onAttachedToWindow(
+        onBitmapReceived: (bmp: Bitmap, recentAd: RecentAd) -> Unit,
+        onError: (reason: String) -> Unit
+    ) {
         Log.d(TAG, "View attached")
         this.onBitmapReceived = onBitmapReceived
+        this.onError = onError
         getCoordinates()
     }
 
     fun onDetachedFromWindow() {
         Log.d(TAG, "View detached")
+    }
 
+    fun onAdDisplayed(recentAd: RecentAd) {
+        adsStorage.saveRecentAd(recentAd)
     }
 
     private fun addBuilderState(state: InfoBuildState) {
-        statesList.add(state)
+        builderStatesList.add(state)
         notifyInfoBuildUpdated()
     }
 
     private fun notifyInfoBuildUpdated() {
-        if (statesList.containsAll(finalBuilderState)) {
+        if (builderStatesList.containsAll(completeBuilderState)) {
             fetchBidder()
         }
     }
@@ -124,7 +130,7 @@ class AdHashVm(
 
             },
             onError = { error ->
-                Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}")
+                Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also(onError))
             }
         )
     }
@@ -137,9 +143,11 @@ class AdHashVm(
             }
 
         safeLet(
+            creatives?.advertiserId,
+            creatives?.budgetId,
             creatives?.advertiserURL,
             creatives?.expectedHashes
-        ) { advertiserURL, expectedHashes ->
+        ) { advertiserId, budgetId, advertiserURL, expectedHashes ->
             val body = AdvertiserBody(
                 expectedHashes = expectedHashes,
                 budgetId = creatives?.budgetId,
@@ -164,27 +172,56 @@ class AdHashVm(
             apiClient.callAdvertiserUrl(advertiserURL, body,
                 onSuccess = { advertiser ->
                     /*STEP 4*/
-                    verifyHashes(advertiser, expectedHashes)
-
+                    verifyHashes(advertiserId, budgetId, advertiser, expectedHashes)
                 },
                 onError = { error ->
-                    Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}")
+                    Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also(onError))
                 }
             )
 
         } ?: run {
-            Log.e(TAG, "Creatives are null")
+            Log.e(TAG, "Creatives are null".also(onError))
         }
     }
 
-    private fun verifyHashes(advertiser: AdvertiserResponse, expectedHashes: ArrayList<String>) {
+    private fun verifyHashes(
+        advertiserId: String,
+        campaignId: Int,
+        advertiser: AdvertiserResponse,
+        expectedHashes: ArrayList<String>
+    ) {
         /*STEP 5*/
-        if (!dataEncryptor.checkIfAdExpected(advertiser.data, expectedHashes)) return
+        val adId = dataEncryptor.sha1(advertiser.data)
 
-        dataEncryptor.getImageFromData(advertiser.data)
-            ?.let(onBitmapReceived) //todo save as displayed ad
-            ?: run { Log.e(TAG, "Failed to extract bitmap") }
+        if (adId.isAdExpected(expectedHashes)) {
+            dataEncryptor.getImageFromData(advertiser.data)
+                ?.let { bmp ->
+                    onBitmapReceived(
+                        bmp, RecentAd(
+                            timestamp = systemInfo.getTimeInUnix(),
+                            advertiserId = advertiserId,
+                            campaignId = campaignId,
+                            adId = adId
+                        )
+                    )
 
-        //todo do step 6
+                    decryptUrl(advertiser.url)
+                }
+                ?: run { Log.e(TAG, "Failed to extract bitmap".also(onError)) }
+
+        } else {
+            Log.e(TAG, "Advertiser not expected".also(onError))
+        }
     }
+
+    private fun decryptUrl(url: String) {
+        val key = adBidderBody
+            .apply { recentAdvertisers = listOf(adsStorage.getAllRecentAds()) } //todo make soft wrap above objects []
+            .let(dataEncryptor::json)
+            .let(dataEncryptor::sha1)
+
+        val url = dataEncryptor.aes256(url, key)
+    }
+
+    private fun String.isAdExpected(expectedHashes: ArrayList<String>): Boolean = this.let(expectedHashes::contains)
 }

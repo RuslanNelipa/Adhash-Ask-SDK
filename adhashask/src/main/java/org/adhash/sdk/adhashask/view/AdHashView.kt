@@ -8,12 +8,12 @@ import android.util.Log
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import coil.api.load
-import coil.transform.CircleCropTransformation
 import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.AdSizes
+import org.adhash.sdk.adhashask.pojo.RecentAd
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
@@ -59,7 +59,10 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        vm.onAttachedToWindow(::loadAdBitmap)
+        vm.onAttachedToWindow(
+            onBitmapReceived = ::loadAdBitmap,
+            onError = ::handleError
+        )
     }
 
     override fun onDetachedFromWindow() {
@@ -84,11 +87,21 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         }
     }
 
-    private fun loadAdBitmap(bitmap: Bitmap){
+    private fun handleError(reason: String) {
+        Log.e(TAG, "Ad load failed: $reason")
+        load(getErrorDrawable())
+    }
+
+    private fun loadAdBitmap(bitmap: Bitmap, recentAd: RecentAd) {
         load(bitmap) {
             crossfade(true)
-            error(errorDrawable ?: ContextCompat.getDrawable(context, R.drawable.ic_cross_24))
+            error(getErrorDrawable())
             placeholder(placeholderDrawable)
+            listener(
+                onSuccess = { _, _ -> vm.onAdDisplayed(recentAd) }
+            )
         }
     }
+
+    private fun getErrorDrawable() = errorDrawable ?: ContextCompat.getDrawable(context, R.drawable.ic_cross_24)
 }

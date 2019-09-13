@@ -121,8 +121,7 @@ class SystemInfo(private val context: Context) {
         return milliseconds / 1000L
     }
 
-    fun getPublishedLocation() =
-        "https://play.google.com/store/apps/details?id=${context.packageName}"
+    fun getPublishedLocation() = "https://play.google.com/store/apps/details?id=${context.packageName}"
 
     fun getPlatform() = "Android API ${getVersionCode()}"
 
