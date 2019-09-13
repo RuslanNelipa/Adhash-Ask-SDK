@@ -21,7 +21,13 @@ inline fun <reified T> String.createRetrofit(vararg interceptors: Interceptor): 
                 .addInterceptor(LoggingInterceptor())
                 .build()
         )
-        .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+        .addConverterFactory(
+            GsonConverterFactory.create(
+                GsonBuilder()
+                    .disableHtmlEscaping()
+                    .create()
+            )
+        )
         .build()
         .create(T::class.java)
 

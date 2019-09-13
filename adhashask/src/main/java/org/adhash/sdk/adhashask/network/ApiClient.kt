@@ -28,7 +28,7 @@ class ApiClient {
 
                 override fun onResponse(call: Call<AdBidderResponse>, response: Response<AdBidderResponse>) {
                     response.body()?.let { adBidder ->
-                        Log.d(TAG, "Ad Bidder received: $adBidder")
+                        Log.d(TAG, "Ad Bidder received.")
                         if (adBidder.creatives.isNullOrEmpty()) {
                             onError(ApiError(ApiErrorCase.BadRequest, requestPath = getRequestPath(call)))
                         } else {
@@ -55,7 +55,7 @@ class ApiClient {
 
                 override fun onResponse(call: Call<AdvertiserResponse>, response: Response<AdvertiserResponse>) {
                     response.body()?.let { advertiserResponse ->
-                        Log.d(TAG, "Advertiser received: $advertiserResponse")
+                        Log.d(TAG, "Advertiser received.")
                         if (advertiserResponse.status != ApiConstants.STATUS_OK) {
                             onError(ApiError(ApiErrorCase.BadRequest, requestPath = getRequestPath(call)))
                         } else {

@@ -9,7 +9,7 @@ object ApiConstants {
     }
 
     object Query{
-        const val RTB = "rtb"
+        const val RTB = "rtb_sdk"
         const val VERSION = 1.0
     }
 

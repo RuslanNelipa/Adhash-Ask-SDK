@@ -16,8 +16,6 @@ import org.adhash.sdk.adhashask.constants.Orientation
 import java.util.*
 import kotlin.math.sqrt
 
-private val TAG = Global.SDK_TAG + SystemInfo::class.java.name
-
 class SystemInfo(private val context: Context) {
 
     fun getTimeZone(): Int {
@@ -56,6 +54,7 @@ class SystemInfo(private val context: Context) {
         }
     }
 
+    @Suppress("DEPRECATION")
     fun getConnectionType(): String {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -123,7 +122,7 @@ class SystemInfo(private val context: Context) {
     }
 
     fun getPublishedLocation() =
-        "https://play.google.com/store/apps/details?id=${context.packageName}" //todo pull parent package name
+        "https://play.google.com/store/apps/details?id=${context.packageName}"
 
     fun getPlatform() = "Android API ${getVersionCode()}"
 

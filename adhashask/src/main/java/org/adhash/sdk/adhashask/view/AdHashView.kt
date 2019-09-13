@@ -34,14 +34,12 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
                     size = "${MeasureSpec.getSize(widthMeasureSpec)}" +
                             "x" +
                             "${MeasureSpec.getSize(heightMeasureSpec)}"
-                )
-            )
-        )
-
-        vm.setBidderProperty( //todo remove. It's for tests
-            creatives = arrayListOf(
-                AdSizes(
-                    size = "300x250"
+                ),
+                AdSizes(//todo remove. It's for tests
+                    size = "728x90"
+                ),
+                AdSizes(//todo remove. It's for tests
+                    size = "350x250"
                 )
             )
         )

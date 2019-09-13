@@ -9,6 +9,7 @@ import java.io.EOFException
 import java.nio.charset.Charset
 
 private val TAG = Global.SDK_TAG + LoggingInterceptor::class.java.simpleName
+private const val INNER_TAG = "API_INTERCEPTOR"
 
 class LoggingInterceptor : Interceptor {
 
@@ -19,7 +20,7 @@ class LoggingInterceptor : Interceptor {
     }
 
     private fun printRequestAndResponse(chain: Interceptor.Chain): Response {
-
+        Log.d(INNER_TAG, "*********************************************************")
         val request = chain.request()
         val requestBody = request.body()
         val reqUrl = request.url()
@@ -39,7 +40,8 @@ class LoggingInterceptor : Interceptor {
             "empty"
         }
 
-        Log.d(TAG, "(SENT -->) url:$reqUrl, body:$bodySent")
+        Log.d(INNER_TAG, "SENT --> url:$reqUrl, body:$bodySent")
+        Log.d(TAG, "SENT --> url:$reqUrl")
 
         val response: Response
         try {
@@ -69,7 +71,8 @@ class LoggingInterceptor : Interceptor {
             }
 
             if (!resBuffer.isPlaintext()) {
-                Log.d(TAG, "(GOT <--) url:$url, statusCode:$code, body:$responseString")
+                Log.d(INNER_TAG, "GOT <-- url:$url, statusCode:$code, body:$responseString")
+                Log.d(TAG, "GOT <-- url:$url, statusCode:$code")
                 return response
             }
 
@@ -78,7 +81,9 @@ class LoggingInterceptor : Interceptor {
             }
         }
 
-        Log.d(TAG, "(GOT <--) url:$url, statusCode:$code, body:$responseString")
+        Log.d(INNER_TAG, "GOT <-- url:$url, statusCode:$code, body:$responseString")
+        Log.d(TAG, "(GOT <--) url:$url, statusCode:$code")
+        Log.d(INNER_TAG, "*********************************************************")
 
         return response
 

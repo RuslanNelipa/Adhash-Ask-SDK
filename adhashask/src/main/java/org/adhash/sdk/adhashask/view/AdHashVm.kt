@@ -117,7 +117,6 @@ class AdHashVm(
 
         apiClient.getAdBidder(adBidderBody,
             onSuccess = { adBidderResponse ->
-                Log.d(TAG, "Fetching bidder received: $adBidderBody")
                 callAdvertiserUrl(adBidderBody, adBidderResponse)
 
             },
@@ -129,7 +128,10 @@ class AdHashVm(
 
     /*STEP 3*/
     private fun callAdvertiserUrl(adBidderBody: AdBidderBody, adBidderResponse: AdBidderResponse) {
-        val creatives = adBidderResponse.creatives?.firstOrNull()
+        val creatives = adBidderResponse.creatives
+            ?.firstOrNull {
+                it.advertiserURL?.isNotEmpty() == true && it.expectedHashes?.isNotEmpty() == true
+            }
 
         safeLet(
             creatives?.advertiserURL,
@@ -159,7 +161,6 @@ class AdHashVm(
             apiClient.callAdvertiserUrl(advertiserURL, body,
                 onSuccess = { advertiser ->
                     /*STEP 4*/
-                    Log.d(TAG, "Advertiser received: $advertiser")
                     verifyHashes(advertiser, expectedHashes)
 
                 },
