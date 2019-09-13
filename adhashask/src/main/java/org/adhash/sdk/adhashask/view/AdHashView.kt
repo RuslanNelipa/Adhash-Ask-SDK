@@ -1,10 +1,16 @@
 package org.adhash.sdk.adhashask.view
 
 import android.content.Context
-import android.graphics.Canvas
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
+import coil.api.load
+import coil.transform.CircleCropTransformation
 import org.adhash.sdk.R
+import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.AdSizes
@@ -12,6 +18,7 @@ import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
 
+private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 
 class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, attrs) {
     private val vm = AdHashVm(
@@ -21,6 +28,10 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         apiClient = ApiClient(),
         dataEncryptor = DataEncryptor()
     )
+
+    /*Attributes*/
+    private var placeholderDrawable: Drawable? = null
+    private var errorDrawable: Drawable? = null
 
     init {
         consumeAttrs(attrs)
@@ -48,18 +59,36 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        vm.onViewDisplayed()
+        vm.onAttachedToWindow(::loadAdBitmap)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        vm.onViewDetached()
+        vm.onDetachedFromWindow()
     }
     /*END VIEW LIFECYCLE*/
 
     private fun consumeAttrs(attrs: AttributeSet?) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.AdHashView)
-        vm.setBidderProperty(publisherId = attributes.getString(R.styleable.AdHashView_publisherId))
-        attributes.recycle()
+
+        try {
+            vm.setBidderProperty(publisherId = attributes.getString(R.styleable.AdHashView_publisherId))
+            placeholderDrawable = attributes.getDrawable(R.styleable.AdHashView_placeholderDrawable)
+            errorDrawable = attributes.getDrawable(R.styleable.AdHashView_errorDrawable)
+            Log.d(TAG, "Attributes extracted")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to read attributes")
+        } finally {
+            attributes.recycle()
+        }
+    }
+
+    private fun loadAdBitmap(bitmap: Bitmap){
+        load(bitmap) {
+            crossfade(true)
+            error(errorDrawable ?: ContextCompat.getDrawable(context, R.drawable.ic_cross_24))
+            placeholder(placeholderDrawable)
+        }
     }
 }

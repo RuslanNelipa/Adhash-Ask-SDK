@@ -1,5 +1,6 @@
 package org.adhash.sdk.adhashask.view
 
+import android.graphics.Bitmap
 import android.util.Log
 import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.ext.safeLet
@@ -24,6 +25,8 @@ class AdHashVm(
 
     private var statesList = mutableListOf<InfoBuildState>()
     private var finalBuilderState = InfoBuildState.values().asList()
+
+    private lateinit var onBitmapReceived: (bmp: Bitmap) -> Unit
 
     enum class InfoBuildState {
         PublisherId, Gps, Creatives
@@ -50,13 +53,13 @@ class AdHashVm(
         }
     }
 
-    fun onViewDisplayed() {
+    fun onAttachedToWindow(onBitmapReceived: (bmp: Bitmap) -> Unit) {
         Log.d(TAG, "View attached")
-
+        this.onBitmapReceived = onBitmapReceived
         getCoordinates()
     }
 
-    fun onViewDetached() {
+    fun onDetachedFromWindow() {
         Log.d(TAG, "View detached")
 
     }
@@ -178,6 +181,10 @@ class AdHashVm(
         /*STEP 5*/
         if (!dataEncryptor.checkIfAdExpected(advertiser.data, expectedHashes)) return
 
-        //todo do step 6 -> dataEncryptor.extractImage(advertiser.data)
+        dataEncryptor.getImageFromData(advertiser.data)
+            ?.let(onBitmapReceived) //todo save as displayed ad
+            ?: run { Log.e(TAG, "Failed to extract bitmap") }
+
+        //todo do step 6
     }
 }

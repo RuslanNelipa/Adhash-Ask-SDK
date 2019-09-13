@@ -35,7 +35,7 @@ class LoggingInterceptor : Interceptor {
         }
 
         val bodySent = if (buffer.isPlaintext()) {
-            buffer.readString(charset)
+            charset?.let(buffer::readString)
         } else {
             "empty"
         }
@@ -92,7 +92,7 @@ class LoggingInterceptor : Interceptor {
     private fun Buffer.isPlaintext(): Boolean {
         try {
             val prefix = Buffer()
-            val byteCount = if (this.size() < 64) this.size() else 64
+            val byteCount = if (this.size < 64) this.size else 64
             this.copyTo(prefix, 0, byteCount)
             for (i in 0..15) {
                 if (prefix.exhausted()) {
