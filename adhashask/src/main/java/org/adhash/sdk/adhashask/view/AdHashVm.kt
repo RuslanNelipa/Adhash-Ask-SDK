@@ -9,6 +9,7 @@ import org.adhash.sdk.adhashask.pojo.*
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
+import kotlin.collections.ArrayList
 
 private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
 
@@ -21,6 +22,13 @@ class AdHashVm(
 ) {
     private val adBidderBody = AdBidderBody()
 
+    private var statesList = mutableListOf<InfoBuildState>()
+    private var finalBuilderState = InfoBuildState.values().asList()
+
+    enum class InfoBuildState {
+        PublisherId, Gps, Creatives
+    }
+
     init {
         buildInitialAdBidder(systemInfo)
     }
@@ -29,12 +37,15 @@ class AdHashVm(
         publisherId: String? = null,
         creatives: ArrayList<AdSizes>? = null
     ) {
-        publisherId?.let {
+        if (adBidderBody.publisherId.isNullOrEmpty()) publisherId?.let {
             adBidderBody.publisherId = it
+            addBuilderState(InfoBuildState.PublisherId)
             Log.d(TAG, "Publisher ID set")
         }
-        creatives?.let {
-            adBidderBody.creatives = it
+
+        if (adBidderBody.creatives.isNullOrEmpty()) creatives?.let {
+            adBidderBody.creatives = creatives
+            addBuilderState(InfoBuildState.Creatives)
             Log.d(TAG, "Creatives set")
         }
     }
@@ -48,6 +59,17 @@ class AdHashVm(
     fun onViewDetached() {
         Log.d(TAG, "View detached")
 
+    }
+
+    private fun addBuilderState(state: InfoBuildState) {
+        statesList.add(state)
+        notifyInfoBuildUpdated()
+    }
+
+    private fun notifyInfoBuildUpdated() {
+        if (statesList.containsAll(finalBuilderState)) {
+            fetchBidder()
+        }
     }
 
     private fun buildInitialAdBidder(systemInfo: SystemInfo) {
@@ -84,7 +106,7 @@ class AdHashVm(
             },
             doFinally = {
                 Log.d(TAG, "Coordinates fetch attempt complete")
-                fetchBidder()
+                addBuilderState(InfoBuildState.Gps)
             }
         )
     }

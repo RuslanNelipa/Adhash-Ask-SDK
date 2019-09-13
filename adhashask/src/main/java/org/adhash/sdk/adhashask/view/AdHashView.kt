@@ -48,8 +48,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
-    override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
         vm.onViewDisplayed()
     }
 

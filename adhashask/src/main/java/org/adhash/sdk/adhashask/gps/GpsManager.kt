@@ -52,6 +52,7 @@ class GpsManager(private val context: Context) {
     ) {
         getLastKnowLocation()?.let { location ->
             onSuccess(Pair(location.latitude, location.longitude))
+            doFinally()
 
         } ?: run {
             requestLocationUpdates(onSuccess, doFinally)
