@@ -1,12 +1,14 @@
 package org.adhash.sdk.adhashask.view
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.Log
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import coil.api.load
 import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.constants.Global
@@ -17,6 +19,7 @@ import org.adhash.sdk.adhashask.pojo.RecentAd
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
+
 
 private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 
@@ -35,6 +38,14 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     init {
         consumeAttrs(attrs)
+    }
+
+    private fun openUrl() {
+        vm.getUri()?.let { uri ->
+            Intent(Intent.ACTION_VIEW)
+                .apply { data = uri }
+                .also { intent -> context.startActivity(intent) }
+        } ?: handleError("URL not found")
     }
 
     /*START VIEW LIFECYCLE*/
@@ -59,6 +70,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        setOnClickListener { openUrl() }
         vm.onAttachedToWindow(
             onBitmapReceived = ::loadAdBitmap,
             onError = ::handleError

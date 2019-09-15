@@ -1,6 +1,7 @@
 package org.adhash.sdk.adhashask.view
 
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.ext.safeLet
@@ -26,6 +27,8 @@ class AdHashVm(
 
     private lateinit var onBitmapReceived: (bmp: Bitmap, recentAd: RecentAd) -> Unit
     private lateinit var onError: (reason: String) -> Unit
+
+    private var uri: Uri? = null
 
     enum class InfoBuildState {
         PublisherId, Gps, Creatives
@@ -69,6 +72,8 @@ class AdHashVm(
     fun onAdDisplayed(recentAd: RecentAd) {
         adsStorage.saveRecentAd(recentAd)
     }
+
+    fun getUri() = uri
 
     private fun addBuilderState(state: InfoBuildState) {
         builderStatesList.add(state)
