@@ -4,5 +4,6 @@
         <attr name="publisherId" format="string" />
         <attr name="placeholderDrawable" format="reference" />
         <attr name="errorDrawable" format="reference" />
+        <attr name="screenshotUrl" format="string" />
     </declare-styleable>
 </resources>

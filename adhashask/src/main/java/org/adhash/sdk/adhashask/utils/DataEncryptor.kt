@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 
@@ -30,8 +31,8 @@ class DataEncryptor {
 
     fun aes256(strToDecrypt: String, secret: String): String? {
         return try {
-            val secretKey = getSecretKey(secret)
-            val cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING")
+            val secretKey = SecretKeySpec(secret.toByteArray(charset("UTF-8")), "AES")
+            val cipher = Cipher.getInstance("AES/CTR/PKCS5PADDING")
             cipher.init(Cipher.DECRYPT_MODE, secretKey)
             cipher.doFinal(base64ToBytes(strToDecrypt)).toString()
         } catch (e: Exception) {

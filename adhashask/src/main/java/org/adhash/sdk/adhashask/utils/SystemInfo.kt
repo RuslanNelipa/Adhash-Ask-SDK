@@ -1,6 +1,7 @@
 package org.adhash.sdk.adhashask.utils
 
 import android.content.Context
+import android.content.Context.ACCESSIBILITY_SERVICE
 import android.content.res.Configuration
 import android.graphics.Point
 import android.net.ConnectivityManager
@@ -9,12 +10,13 @@ import android.os.Build
 import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.view.WindowManager
+import android.view.accessibility.AccessibilityManager
 import org.adhash.sdk.adhashask.constants.ConnectionType
 import org.adhash.sdk.adhashask.constants.DeviceType
-import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.constants.Orientation
 import java.util.*
 import kotlin.math.sqrt
+
 
 class SystemInfo(private val context: Context) {
 
@@ -141,6 +143,10 @@ class SystemInfo(private val context: Context) {
 
     fun getCarrierId() = (context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager)
         .run { networkOperatorName } ?: ""
+
+    fun isTalkBackEnabled() =
+        (context.getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager?)
+            ?.run { isEnabled || isTouchExplorationEnabled } ?: false
 
     private fun capitalizeDeviceModel(str: String): String {
         if (TextUtils.isEmpty(str)) {

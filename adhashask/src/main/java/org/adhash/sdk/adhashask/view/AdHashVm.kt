@@ -75,6 +75,8 @@ class AdHashVm(
 
     fun getUri() = uri
 
+    fun isTalkbackEnabled() = systemInfo.isTalkBackEnabled()
+
     private fun addBuilderState(state: InfoBuildState) {
         builderStatesList.add(state)
         notifyInfoBuildUpdated()

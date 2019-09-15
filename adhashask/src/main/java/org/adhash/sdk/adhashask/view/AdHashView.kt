@@ -1,14 +1,18 @@
 package org.adhash.sdk.adhashask.view
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
+import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
+import android.view.MotionEvent
+import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import coil.api.load
 import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.constants.Global
@@ -23,6 +27,8 @@ import org.adhash.sdk.adhashask.utils.SystemInfo
 
 private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 
+private const val SCREENSHOT_HANDLER_DELAY = 3000L
+
 class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, attrs) {
     private val vm = AdHashVm(
         systemInfo = SystemInfo(context),
@@ -35,17 +41,18 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     /*Attributes*/
     private var placeholderDrawable: Drawable? = null
     private var errorDrawable: Drawable? = null
+    private var screenshotUrl: String? = null
+
+    private var screenshotUrlOpened = false
+    private val screenshotHandler = Handler()
+    private val screenshotRunnable by lazy {
+        val delay = SCREENSHOT_HANDLER_DELAY
+        val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        ScreenshotRunnable(delay, am)
+    }
 
     init {
         consumeAttrs(attrs)
-    }
-
-    private fun openUrl() {
-        vm.getUri()?.let { uri ->
-            Intent(Intent.ACTION_VIEW)
-                .apply { data = uri }
-                .also { intent -> context.startActivity(intent) }
-        } ?: handleError("URL not found")
     }
 
     /*START VIEW LIFECYCLE*/
@@ -70,16 +77,23 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        setOnClickListener { openUrl() }
+        setOnTouchListener { _, motionEvent ->
+            if (motionEvent.action == MotionEvent.ACTION_DOWN)
+                openUri()
+            true
+        }
         vm.onAttachedToWindow(
             onBitmapReceived = ::loadAdBitmap,
             onError = ::handleError
         )
+        disableAdForVisionImpaired()
+        detectScreenShotService()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         vm.onDetachedFromWindow()
+        stopDetectingScreenshots()
     }
     /*END VIEW LIFECYCLE*/
 
@@ -90,6 +104,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
             vm.setBidderProperty(publisherId = attributes.getString(R.styleable.AdHashView_publisherId))
             placeholderDrawable = attributes.getDrawable(R.styleable.AdHashView_placeholderDrawable)
             errorDrawable = attributes.getDrawable(R.styleable.AdHashView_errorDrawable)
+            screenshotUrl = attributes.getString(R.styleable.AdHashView_screenshotUrl)
             Log.d(TAG, "Attributes extracted")
 
         } catch (e: Exception) {
@@ -116,4 +131,47 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     }
 
     private fun getErrorDrawable() = errorDrawable ?: ContextCompat.getDrawable(context, R.drawable.ic_cross_24)
+
+    private fun disableAdForVisionImpaired() {
+        if (vm.isTalkbackEnabled()) visibility = View.GONE
+    }
+
+    private fun openUri() = vm.getUri()?.let { uri ->
+        Intent(Intent.ACTION_VIEW)
+            .apply { data = uri }
+            .also { intent -> context.startActivity(intent) }
+    } ?: handleError("URL not found")
+
+    private fun openScreenshotUrl() = screenshotUrl?.let {
+        Intent(Intent.ACTION_VIEW)
+            .apply { data = Uri.parse(it) }
+            .also { intent -> context.startActivity(intent) }
+    }
+
+    private fun detectScreenShotService() {screenshotUrl
+        screenshotUrl?.let {
+            screenshotHandler.postDelayed(screenshotRunnable, SCREENSHOT_HANDLER_DELAY)
+        }
+    }
+
+    private fun stopDetectingScreenshots() {
+        screenshotHandler.removeCallbacks(screenshotRunnable)
+    }
+
+    private inner class ScreenshotRunnable(
+        private val delay: Long,
+        private val activityManager: ActivityManager
+    ) : Runnable {
+        override fun run() {
+            activityManager.getRunningServices(200)
+                .filter { it.process == "com.android.systemui:screenshot" }
+                .takeIf { !screenshotUrlOpened }
+                ?.forEach { _ ->
+                    openScreenshotUrl()
+                    screenshotUrlOpened = true
+                }
+                ?.also { screenshotHandler.postDelayed(this, delay) }
+
+        }
+    }
 }
