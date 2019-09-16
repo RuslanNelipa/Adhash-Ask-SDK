@@ -1,6 +1,7 @@
 package org.adhash.sdk.adhashask.network
 
 import android.util.Log
+import com.google.gson.Gson
 import org.adhash.sdk.adhashask.base.BaseResponse
 import org.adhash.sdk.adhashask.constants.ApiConstants
 import org.adhash.sdk.adhashask.constants.Global
@@ -13,11 +14,14 @@ import retrofit2.Response
 
 private val TAG = Global.SDK_TAG + ApiClient::class.java.simpleName
 
-class ApiClient {
+class ApiClient(
+    private val gson: Gson
+) {
+
     private val errorHandler = ErrorHandler()
 
     fun getAdBidder(body: AdBidderBody, onSuccess: (AdBidderResponse) -> Unit, onError: (ApiError) -> Unit) {
-        ApiConstants.API_BASE_URL.createRetrofit<AdHashApi>()
+        ApiConstants.API_BASE_URL.createRetrofit<AdHashApi>(gson)
             .getAdBidder(bodyAd = body, action = ApiConstants.Query.RTB, version = ApiConstants.Query.VERSION)
             .enqueue(object : Callback<AdBidderResponse> {
                 override fun onFailure(call: Call<AdBidderResponse>, error: Throwable) {
@@ -45,7 +49,7 @@ class ApiClient {
     }
 
     fun callAdvertiserUrl(advertiserUrl: String, body: AdvertiserBody, onSuccess: (AdvertiserResponse) -> Unit, onError: (ApiError) -> Unit) {
-        advertiserUrl.extractBaseUrl().createRetrofit<AdvertiserApi>()
+        advertiserUrl.extractBaseUrl().createRetrofit<AdvertiserApi>(gson)
             .callAdvertiserUrl(advertiserUrl,body).enqueue(object : Callback<AdvertiserResponse> {
                 override fun onFailure(call: Call<AdvertiserResponse>, error: Throwable) {
                     val apiError = errorHandler.consumeThrowable(error, getRequestPath(call))

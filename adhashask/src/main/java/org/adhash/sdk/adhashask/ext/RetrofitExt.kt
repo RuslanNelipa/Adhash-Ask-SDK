@@ -1,5 +1,6 @@
 package org.adhash.sdk.adhashask.ext
 
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -10,7 +11,7 @@ import java.net.MalformedURLException
 import java.net.URL
 
 
-inline fun <reified T> String.createRetrofit(vararg interceptors: Interceptor): T =
+inline fun <reified T> String.createRetrofit(gson: Gson, vararg interceptors: Interceptor): T =
     Retrofit.Builder()
         .baseUrl(this)
         .client(
@@ -21,13 +22,7 @@ inline fun <reified T> String.createRetrofit(vararg interceptors: Interceptor): 
                 .addInterceptor(LoggingInterceptor())
                 .build()
         )
-        .addConverterFactory(
-            GsonConverterFactory.create(
-                GsonBuilder()
-                    .disableHtmlEscaping()
-                    .create()
-            )
-        )
+        .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
         .create(T::class.java)
 

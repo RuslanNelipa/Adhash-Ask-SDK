@@ -7,11 +7,10 @@ import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
+class DataEncryptor(private val gson: Gson) {
 
-class DataEncryptor {
     fun getImageFromData(data: String?) = data
         .takeIf { it?.startsWith("data:image") == true }
         ?.substringAfter("base64")
@@ -63,5 +62,5 @@ class DataEncryptor {
 
     private fun base64ToBytes(base64String: String) = Base64.decode(base64String, Base64.DEFAULT)
 
-    fun json(bidder: Any) = Gson().toJson(bidder).toString()
+    fun json(bidder: Any) = gson.toJson(bidder).toString()
 }

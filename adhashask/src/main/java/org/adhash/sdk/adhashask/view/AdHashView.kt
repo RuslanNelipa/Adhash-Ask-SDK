@@ -14,6 +14,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import coil.api.load
+import com.google.gson.GsonBuilder
 import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.gps.GpsManager
@@ -30,12 +31,16 @@ private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 private const val SCREENSHOT_HANDLER_DELAY = 3000L
 
 class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, attrs) {
+    private val gson = GsonBuilder()
+        .disableHtmlEscaping()
+        .create()
+
     private val vm = AdHashVm(
         systemInfo = SystemInfo(context),
         gpsManager = GpsManager(context),
         adsStorage = AdsStorage(context),
-        apiClient = ApiClient(),
-        dataEncryptor = DataEncryptor()
+        apiClient = ApiClient(gson),
+        dataEncryptor = DataEncryptor(gson)
     )
 
     /*Attributes*/
@@ -59,17 +64,18 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         vm.setBidderProperty(
             creatives = arrayListOf(
-                AdSizes(
-                    size = "${MeasureSpec.getSize(widthMeasureSpec)}" +
-                            "x" +
-                            "${MeasureSpec.getSize(heightMeasureSpec)}"
-                ),
+//                AdSizes(
+//                    size = "${MeasureSpec.getSize(widthMeasureSpec)}" +
+//                            "x" +
+//                            "${MeasureSpec.getSize(heightMeasureSpec)}"
+//                ),
                 AdSizes(//todo remove. It's for tests
                     size = "728x90"
-                ),
-                AdSizes(//todo remove. It's for tests
-                    size = "350x250"
                 )
+//            ,
+//                AdSizes(//todo remove. It's for tests
+//                    size = "350x250"
+//                )
             )
         )
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
