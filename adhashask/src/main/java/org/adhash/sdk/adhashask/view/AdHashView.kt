@@ -38,7 +38,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     private val vm = AdHashVm(
         systemInfo = SystemInfo(context),
         gpsManager = GpsManager(context),
-        adsStorage = AdsStorage(context),
+        adsStorage = AdsStorage(context, gson),
         apiClient = ApiClient(gson),
         dataEncryptor = DataEncryptor(gson)
     )

@@ -70,7 +70,14 @@ class AdHashVm(
     }
 
     fun onAdDisplayed(recentAd: RecentAd) {
-        adsStorage.saveRecentAd(recentAd)
+        adsStorage.saveRecentAd(
+            listOf(
+                recentAd.timestamp,
+                recentAd.advertiserId,
+                recentAd.campaignId,
+                recentAd.adId
+            )
+        )
     }
 
     fun getUri() = uri
@@ -129,7 +136,7 @@ class AdHashVm(
 
     /*STEP 1*/
     private fun fetchBidder() {
-        Log.d(TAG, "Fetching bidder AD")
+        Log.d(TAG, "Fetching bidder AD: ${adBidderBody.let(dataEncryptor::json)}")
 
         apiClient.getAdBidder(adBidderBody,
             onSuccess = { adBidderResponse ->
@@ -173,7 +180,7 @@ class AdHashVm(
                 mobile = adBidderBody.mobile,
                 blockedAdvertisers = adBidderBody.blockedAdvertisers,
                 currentTimestamp = adBidderBody.currentTimestamp,
-                recentAds = listOf(adsStorage.getAllRecentAds())
+                recentAds = adBidderBody.recentAdvertisers
             )
 
             apiClient.callAdvertiserUrl(advertiserURL, body,
@@ -222,11 +229,18 @@ class AdHashVm(
     }
 
     private fun decryptUrl(url: String) {
+        Log.d(TAG, "JSON for URL: ${adBidderBody.let(dataEncryptor::json)}") //todo temp logs
+        Log.d(TAG, "KEY for URL after SHA-1: ${adBidderBody.let(dataEncryptor::json).let(dataEncryptor::sha1)}") //todo temp logs
+
         val key = adBidderBody
             .let(dataEncryptor::json)
             .let(dataEncryptor::sha1)
 
-        val url = dataEncryptor.aes256(url, key)
+//        val url = dataEncryptor.aes256(url, key)
+
+        Log.d(TAG, "Encrypted URL: $url")
+        Log.d(TAG, "Encrypted KEY: $key")
+
     }
 
     private fun String.isAdExpected(expectedHashes: ArrayList<String>): Boolean = this.let(expectedHashes::contains)
