@@ -108,7 +108,7 @@ class AdHashVm(
                     type = getPhoneType()
                 )
                 isp = getCarrierId()
-                recentAdvertisers = listOf(adsStorage.getAllRecentAds())
+                recentAdvertisers = adsStorage.getAllRecentAds()
             }
         }
         Log.d(TAG, "Initial bidder creation complete")
@@ -223,7 +223,6 @@ class AdHashVm(
 
     private fun decryptUrl(url: String) {
         val key = adBidderBody
-            .apply { recentAdvertisers = listOf(adsStorage.getAllRecentAds()) } //todo make soft wrap above objects []
             .let(dataEncryptor::json)
             .let(dataEncryptor::sha1)
 
