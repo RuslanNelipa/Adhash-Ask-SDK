@@ -164,23 +164,23 @@ class AdHashVm(
         ) { advertiserId, budgetId, advertiserURL, expectedHashes ->
             val body = AdvertiserBody(
                 expectedHashes = expectedHashes,
-                budgetId = creatives?.budgetId,
-                period = adBidderResponse.period,
-                nonce = adBidderResponse.nonce,
+                budgetId = budgetId,
                 timezone = adBidderBody.timezone,
                 location = adBidderBody.location,
                 publisherId = adBidderBody.publisherId,
                 size = adBidderBody.size,
                 navigator = adBidderBody.navigator,
                 connection = adBidderBody.connection,
-                isp = adBidderBody.connection,
+                isp = adBidderBody.isp,
                 orientation = adBidderBody.orientation,
                 gps = adBidderBody.gps,
                 creatives = adBidderBody.creatives,
                 mobile = adBidderBody.mobile,
                 blockedAdvertisers = adBidderBody.blockedAdvertisers,
                 currentTimestamp = adBidderBody.currentTimestamp,
-                recentAds = adBidderBody.recentAdvertisers
+                recentAds = adBidderBody.recentAdvertisers,
+                period = adBidderResponse.period,
+                nonce = adBidderResponse.nonce
             )
 
             apiClient.callAdvertiserUrl(advertiserURL, body,

@@ -1,5 +1,6 @@
 package org.adhash.sdk.adhashask.view
 
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
@@ -24,7 +25,6 @@ import org.adhash.sdk.adhashask.pojo.RecentAd
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
-
 
 private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 
@@ -61,6 +61,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     }
 
     /*START VIEW LIFECYCLE*/
+    @SuppressLint("DrawAllocation")
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         vm.setBidderProperty(
             creatives = arrayListOf(
@@ -154,7 +155,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
             .also { intent -> context.startActivity(intent) }
     }
 
-    private fun detectScreenShotService() {screenshotUrl
+    private fun detectScreenShotService() {
         screenshotUrl?.let {
             screenshotHandler.postDelayed(screenshotRunnable, SCREENSHOT_HANDLER_DELAY)
         }
