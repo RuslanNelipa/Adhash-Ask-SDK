@@ -70,13 +70,13 @@ class AdHashVm(
     }
 
     fun onAdDisplayed(recentAd: RecentAd) {
-        adsStorage.saveRecentAd(
-            listOf(
-                recentAd.timestamp,
-                recentAd.advertiserId,
-                recentAd.campaignId,
-                recentAd.adId
-            )
+        adsStorage.saveRecentAd(recentAd
+//            listOf(
+//                recentAd.timestamp.toBigInteger(),
+//                recentAd.advertiserId,
+//                recentAd.campaignId.toBigInteger(),
+//                recentAd.adId
+//            )
         )
     }
 
@@ -141,6 +141,7 @@ class AdHashVm(
         apiClient.getAdBidder(adBidderBody,
             onSuccess = { adBidderResponse ->
                 callAdvertiserUrl(adBidderBody, adBidderResponse)
+                Log.d(TAG, "AdBidder response: ${adBidderResponse.let(dataEncryptor::json)}")
 
             },
             onError = { error ->
@@ -178,15 +179,25 @@ class AdHashVm(
                 mobile = adBidderBody.mobile,
                 blockedAdvertisers = adBidderBody.blockedAdvertisers,
                 currentTimestamp = adBidderBody.currentTimestamp,
-                recentAds = adBidderBody.recentAdvertisers,
+                recentAdvertisers = adBidderBody.recentAdvertisers,
                 period = adBidderResponse.period,
                 nonce = adBidderResponse.nonce
             )
+            Log.d(TAG, "Advertiser Body: ${body.let(dataEncryptor::json)}")
 
             apiClient.callAdvertiserUrl(advertiserURL, body,
                 onSuccess = { advertiser ->
+                    Log.d(TAG, "Advertiser response: ${advertiser.let(dataEncryptor::json)}")
+
                     /*STEP 4*/
-                    verifyHashes(advertiserId, budgetId, advertiser, expectedHashes)
+                    verifyHashes(
+                        advertiserId,
+                        budgetId,
+                        advertiser,
+                        expectedHashes,
+                        body.nonce,
+                        body.period
+                    )
                 },
                 onError = { error ->
                     Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also(onError))
@@ -202,7 +213,9 @@ class AdHashVm(
         advertiserId: String,
         campaignId: Int,
         advertiser: AdvertiserResponse,
-        expectedHashes: ArrayList<String>
+        expectedHashes: ArrayList<String>,
+        nonce: Int?,
+        period: Int?
     ) {
         /*STEP 5*/
         val adId = dataEncryptor.sha1(advertiser.data)
@@ -219,7 +232,7 @@ class AdHashVm(
                         )
                     )
 
-                    decryptUrl(advertiser.url)
+                    decryptUrl(advertiser.url, nonce, period)
                 }
                 ?: run { Log.e(TAG, "Failed to extract bitmap".also(onError)) }
 
@@ -228,18 +241,38 @@ class AdHashVm(
         }
     }
 
-    private fun decryptUrl(url: String) {
-        Log.d(TAG, "JSON for URL: ${adBidderBody.let(dataEncryptor::json)}") //todo temp logs
-        Log.d(TAG, "KEY for URL after SHA-1: ${adBidderBody.let(dataEncryptor::json).let(dataEncryptor::sha1)}") //todo temp logs
+    private fun decryptUrl(url: String, nonce: Int?, period: Int?) {
+        val keyBody = KeyBody(
+            nonce = nonce,
+            period = period,
+            timezone = adBidderBody.timezone,
+            location = adBidderBody.location,
+            publisherId = adBidderBody.publisherId,
+            size = adBidderBody.size,
+            referrer = adBidderBody.referrer,
+            navigator = adBidderBody.navigator,
+            connection = adBidderBody.connection,
+            isp = adBidderBody.isp,
+            orientation = adBidderBody.orientation,
+            gps = adBidderBody.gps,
+            mobile = adBidderBody.mobile,
+            currentTimestamp = adBidderBody.currentTimestamp,
+            creatives = adBidderBody.creatives,
+            blockedAdvertisers = adBidderBody.blockedAdvertisers,
+            recentAdvertisers = adBidderBody.recentAdvertisers
+        )
 
-        val key = adBidderBody
+        Log.d(TAG, "Key body : ${keyBody.let(dataEncryptor::json)}")
+
+        val key = keyBody
             .let(dataEncryptor::json)
             .let(dataEncryptor::sha1)
 
-//        val url = dataEncryptor.aes256(url, key)
+        val redirectUrl = dataEncryptor.aes256(url, key)
 
         Log.d(TAG, "Encrypted URL: $url")
         Log.d(TAG, "Encrypted KEY: $key")
+        Log.d(TAG, "Decrypted URL: $redirectUrl")
 
     }
 

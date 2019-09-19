@@ -6,6 +6,7 @@ data class AdvertiserResponse(
     val url: String,
     val data: String,
     val width: Int,
-    val height: Int
+    val height: Int,
+    val dataKey: String
 
 ) : BaseResponse()

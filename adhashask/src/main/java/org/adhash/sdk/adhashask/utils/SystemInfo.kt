@@ -97,7 +97,6 @@ class SystemInfo(private val context: Context) {
                         TelephonyManager.NETWORK_TYPE_TD_SCDMA -> ConnectionType.CONNECTION_TD_SCDMA
                         TelephonyManager.NETWORK_TYPE_LTE -> ConnectionType.CONNECTION_LTE
                         TelephonyManager.NETWORK_TYPE_IWLAN -> ConnectionType.CONNECTION_IWLAN
-                        TelephonyManager.NETWORK_TYPE_NR -> ConnectionType.CONNECTION_NR
                         else -> ConnectionType.CONNECTION_UNKNOWN
                     }
                     else -> ConnectionType.CONNECTION_UNKNOWN
@@ -120,7 +119,7 @@ class SystemInfo(private val context: Context) {
         val calDate = Calendar.getInstance(TimeZone.getDefault()).time
         var milliseconds = calDate.time
         milliseconds += timeZone.getOffset(milliseconds)
-        return milliseconds / 1000L
+        return milliseconds / 1000
     }
 
     fun getPublishedLocation() = "https://play.google.com/store/apps/details?id=${context.packageName}"

@@ -70,13 +70,13 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 //                            "x" +
 //                            "${MeasureSpec.getSize(heightMeasureSpec)}"
 //                ),
-                AdSizes(//todo remove. It's for tests
-                    size = "728x90"
-                )
-//            ,
 //                AdSizes(//todo remove. It's for tests
-//                    size = "350x250"
+//                    size = "728x90"
 //                )
+//            ,
+                AdSizes(//todo remove. It's for tests
+                    size = "300x250"
+                )
             )
         )
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)

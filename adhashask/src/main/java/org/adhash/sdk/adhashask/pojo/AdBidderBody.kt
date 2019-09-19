@@ -1,6 +1,6 @@
 package org.adhash.sdk.adhashask.pojo
 
-data class AdBidderBody(
+open class AdBidderBody(
     var timezone: Int? = null,
     var location: String? = null,
     var publisherId: String? = null,
@@ -11,11 +11,11 @@ data class AdBidderBody(
     var isp: String? = null,
     var orientation: String? = null,
     var gps: String? = null,
-    var mobile: Boolean = true,
     var currentTimestamp: Long? = null,
     var creatives: ArrayList<AdSizes>? = null,
     var blockedAdvertisers: ArrayList<String>? = null,
-    var recentAdvertisers: List<List<Any?>?>? = null
+    var recentAdvertisers: List<RecentAd>? = null,
+    var mobile: Boolean = true
 ) {
     override fun toString(): String {
         return "AdBidderBody(timezone=$timezone, " +

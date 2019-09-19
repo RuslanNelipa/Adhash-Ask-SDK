@@ -1,12 +1,12 @@
 package org.adhash.sdk.adhashask.pojo
 
 
-class AdvertiserBody(
+data class AdvertiserBody(
     var orientation: String? = null,
     var blockedAdvertisers: List<Any?>? = null,
     var period: Int? = null,
     var expectedHashes: List<String?>? = null,
-    var recentAds: List<List<Any?>?>? = null,
+    var recentAdvertisers: List<RecentAd>? = null,
     var timezone: Int? = null,
     var isp: String? = null,
     var navigator: Navigator? = null,
