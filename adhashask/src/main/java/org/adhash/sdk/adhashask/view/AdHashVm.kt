@@ -2,6 +2,7 @@ package org.adhash.sdk.adhashask.view
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Base64
 import android.util.Log
 import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.ext.safeLet
@@ -11,6 +12,15 @@ import org.adhash.sdk.adhashask.pojo.*
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
+import java.util.*
+import java.util.Base64.getDecoder
+import javax.crypto.Cipher
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.PBEKeySpec
+import javax.crypto.spec.SecretKeySpec
+import kotlin.collections.ArrayList
+
 
 private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
 
@@ -275,6 +285,5 @@ class AdHashVm(
         Log.d(TAG, "Decrypted URL: $redirectUrl")
 
     }
-
     private fun String.isAdExpected(expectedHashes: ArrayList<String>): Boolean = this.let(expectedHashes::contains)
 }
