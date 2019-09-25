@@ -10,6 +10,7 @@ import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.*
 import org.adhash.sdk.adhashask.storage.AdsStorage
+import org.adhash.sdk.adhashask.utils.Aes
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
 import java.util.*
@@ -279,6 +280,8 @@ class AdHashVm(
             .let(dataEncryptor::sha1)
 
         val redirectUrl = dataEncryptor.aes256(url, key)
+        val test = Aes.decrypt(url, key)
+
 
         Log.d(TAG, "Encrypted URL: $url")
         Log.d(TAG, "Encrypted KEY: $key")

@@ -23,6 +23,7 @@ import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.AdSizes
 import org.adhash.sdk.adhashask.pojo.RecentAd
 import org.adhash.sdk.adhashask.storage.AdsStorage
+import org.adhash.sdk.adhashask.utils.Aes
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
 

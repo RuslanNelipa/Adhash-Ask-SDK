@@ -3,15 +3,13 @@ package org.adhash.sdk.adhashask.utils
 import android.graphics.BitmapFactory
 import android.util.Base64
 import com.google.gson.Gson
-import java.io.UnsupportedEncodingException
-import java.security.InvalidKeyException
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.util.*
-import javax.crypto.*
+import javax.crypto.Cipher
+import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
-import javax.crypto.spec.SecretKeySpec
+
 
 private const val algorithm = "AES"
 private const val padding = "AES/CTR/PKCS5Padding"
