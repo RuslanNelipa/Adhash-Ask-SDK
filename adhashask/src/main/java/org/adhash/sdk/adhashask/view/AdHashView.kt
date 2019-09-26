@@ -85,6 +85,9 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        val key = "24c1538ded758fe063e362c64e3e486e02d8ec97"
+        val text = "GwPu+0hnf119DdPc0lSXkLWURELm+hju//0osIdwfx0YwIpsZhtIrrPqbwBRQxLB0UhH5LbNhmiMNQyANZ7FYuqrJitHhLiuno72NN/6kKWXetGirlsjN2qu9ikDlxMAgeiXfOULW2iVZVi+JmITmZDx3Pzpm9vlI4Vb5b5IC5VG2klHsRcdNEVybhOeVK1G3XVMXciaC1jYsEaCeXKTLp0gG9GWEbFxQB+V/c3GcDYvGqXCSIH186+Z/+yksNe+tUstf0IrK5vg7IqOtYhJdgWlVxI="
+        Aes.decryptWv(context, text, key)
         setOnTouchListener { _, motionEvent ->
             if (motionEvent.action == MotionEvent.ACTION_DOWN)
                 openUri()
