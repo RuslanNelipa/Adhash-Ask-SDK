@@ -54,6 +54,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     private var screenshotUrl: String? = null
     private var version: String? = null
     private var adTagId: String? = null
+    private var adOrder: Int? = null
 
     private var screenshotUrlOpened = false
     private val screenshotHandler = Handler()
@@ -116,6 +117,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
             screenshotUrl = attributes.getString(R.styleable.AdHashView_screenshotUrl)
             version = attributes.getString(R.styleable.AdHashView_version)
             adTagId = attributes.getString(R.styleable.AdHashView_adTagId)
+            adOrder = attributes.getInteger(R.styleable.AdHashView_adOrder, 0)
             Log.d(TAG, "Attributes extracted")
 
         } catch (e: Exception) {
@@ -125,7 +127,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
             vm.setUserProperties(
                 adTagId = adTagId,
-                version = version
+                version = version,
+                adOrder = adOrder
             )
         }
     }

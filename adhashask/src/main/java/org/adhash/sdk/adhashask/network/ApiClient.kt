@@ -75,7 +75,7 @@ class ApiClient(
             })
     }
 
-    fun callAnalyticsModule(url: String, onSuccess: (BaseResponse) -> Unit, onError: (ApiError) -> Unit){
+    fun callAnalyticsModule(url: String, analyticsBody: AnalyticsBody, onSuccess: (BaseResponse) -> Unit, onError: (ApiError) -> Unit){
         url.extractBaseUrl().createRetrofit<AdvertiserApi>(gson)
             .callAnalytics(url).enqueue(
                 object : Callback<BaseResponse> {

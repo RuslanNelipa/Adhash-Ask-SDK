@@ -35,6 +35,7 @@ class AdHashVm(
     private var uri: Uri? = null
     private var adTagId: String? = null
     private var version: String? = null
+    private var adOrder: Int? = null
 
     enum class InfoBuildState {
         PublisherId, Gps, Creatives
@@ -44,9 +45,10 @@ class AdHashVm(
         buildInitialAdBidder(systemInfo)
     }
 
-    fun setUserProperties(adTagId: String?, version: String?) {
+    fun setUserProperties(adTagId: String?, version: String?, adOrder: Int?) {
         this.adTagId = adTagId
         this.version = version
+        this.adOrder = adOrder
     }
 
     fun setBidderProperty(
@@ -195,6 +197,7 @@ class AdHashVm(
 
                     /*STEP 4*/
                     verifyHashes(
+                        adBidderResponse,
                         advertiserId,
                         budgetId,
                         advertiser,
@@ -214,6 +217,7 @@ class AdHashVm(
     }
 
     private fun verifyHashes(
+        adBidderResponse: AdBidderResponse,
         advertiserId: String,
         campaignId: Int,
         advertiser: AdvertiserResponse,
@@ -236,7 +240,7 @@ class AdHashVm(
                         )
                     )
 
-                    decryptUrl(advertiser.url, nonce, period)
+                    decryptUrl(adBidderResponse, advertiser.url, adId, nonce, period)
                 }
                 ?: run { Log.e(TAG, "Failed to extract bitmap".also(onError)) }
 
@@ -245,7 +249,7 @@ class AdHashVm(
         }
     }
 
-    private fun decryptUrl(url: String, nonce: Int?, period: Int?) {
+    private fun decryptUrl(adBidderResponse: AdBidderResponse, url: String, adId: String, nonce: Int?, period: Int?) {
         val keyBody = KeyBody(
             nonce = nonce,
             period = period,
@@ -275,6 +279,7 @@ class AdHashVm(
         dataEncryptor.aes256(context, url, key,
             onReceived = {
                 parseUrl(it)
+                callAnalyticsModule(it, adId, adBidderResponse)
             }
         )
 
@@ -289,8 +294,43 @@ class AdHashVm(
 
     }
 
-    private fun callAnalyticsModule(url: String) {
-        apiClient.callAnalyticsModule(url)
+    private fun callAnalyticsModule(url: String, adId: String, adBidderResponse: AdBidderResponse) {
+        val analyticsBody = AnalyticsBody(
+            adTagId = adTagId,
+            publishedId = adBidderBody.publisherId,
+            creativeHash = adId,
+            advertiserId = adBidderResponse.creatives?.firstOrNull()?.advertiserId,
+            pageURL = adBidderBody.location,
+            platform = adBidderBody.navigator?.platform,
+            connection = adBidderBody.connection,
+            isp = adBidderBody.isp,
+            orientation = adBidderBody.orientation,
+            gps = adBidderBody.gps,
+            language = adBidderBody.navigator?.language,
+            device = adBidderBody.navigator?.model?.substringBefore(" "),
+            model = adBidderBody.navigator?.model?.substringAfter(" "),
+            type = adBidderBody.navigator?.type,
+            screenWidth = adBidderBody.size?.screenWidth,
+            screenHeight = adBidderBody.size?.screenHeight,
+            timeZone = adBidderBody.timezone,
+            width = adBidderBody.creatives?.firstOrNull()?.size?.substringBefore("x"),
+            height = adBidderBody.creatives?.firstOrNull()?.size?.substringAfter("x"),
+            period = adBidderResponse.period,
+            cost = adBidderResponse.creatives?.firstOrNull()?.maxPrice, //todo verify
+            comission = adBidderResponse.creatives?.firstOrNull()?.commission,
+            nonce = adBidderResponse.nonce,
+            pageview = (adOrder == 1 || adOrder == 0),
+            mobile = true
+        )
+
+        apiClient.callAnalyticsModule(url, analyticsBody,
+            onSuccess = {
+
+            },
+            onError = {
+
+            }
+        )
 
         uri = Uri.parse(url)
 
