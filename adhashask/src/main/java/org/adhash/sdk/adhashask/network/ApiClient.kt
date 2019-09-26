@@ -73,8 +73,35 @@ class ApiClient(
                     }
                 }
             })
-
     }
 
+    fun callAnalyticsModule(url: String, onSuccess: (BaseResponse) -> Unit, onError: (ApiError) -> Unit){
+        url.extractBaseUrl().createRetrofit<AdvertiserApi>(gson)
+            .callAnalytics(url).enqueue(
+                object : Callback<BaseResponse> {
+                    override fun onFailure(call: Call<BaseResponse>, error: Throwable) {
+                        val apiError = errorHandler.consumeThrowable(error, getRequestPath(call))
+                        Log.e(TAG, "API call exception:  $error")
+                        onError(apiError)
+                    }
+
+                    override fun onResponse(call: Call<BaseResponse>, response: Response<BaseResponse>) {
+                        response.body()?.let { advertiserResponse ->
+                            Log.d(TAG, "Analytics module succeed.")
+                            if (advertiserResponse.status != ApiConstants.STATUS_OK) {
+                                onError(ApiError(ApiErrorCase.BadRequest, requestPath = getRequestPath(call)))
+                            } else {
+                                onSuccess(advertiserResponse)
+                            }
+
+                        } ?: run {
+                            val httpError = errorHandler.consumeError(response, getRequestPath(call))
+                            Log.e(TAG, "Failed to make API call:  $httpError")
+                            onError(httpError)
+                        }
+                    }
+                }
+            )
+    }
     private fun getRequestPath(call: Call<out BaseResponse>) = call.request().url().encodedPath()
 }

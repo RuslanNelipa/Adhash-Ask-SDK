@@ -15,7 +15,7 @@ class ErrorHandler {
         val errorMessage = networkError.message?.let { it } ?: ""
 
         val case =  when (networkError) {
-            is HttpException -> extractErrorCase(networkError)
+            is HttpException -> ApiErrorCase.HttpError
             is SocketTimeoutException,
             is UnknownHostException -> ApiErrorCase.NoInternet
             is JsonSyntaxException -> ApiErrorCase.BadRequest
@@ -30,25 +30,10 @@ class ErrorHandler {
     }
 
     fun consumeError(response: Response<out BaseResponse>, requestPath: String): ApiError {
-        //todo parse HttpErrors
         return ApiError(
             errorCase = ApiErrorCase.Unknown,
             errorMessage = response.message(),
             requestPath = requestPath
         )
-//        when(response.errorBody()){}
-
-    }
-
-    private fun extractErrorCase(error: HttpException): ApiErrorCase {
-        return ApiErrorCase.Unknown
-        //todo read error body
-//        error.response().errorBody()?.let { errorBody ->
-//            return try {
-//                val errorJson = JSONObject(errorBody.string())
-//                val errorActionName = errorJson.optString("error")
-//                ErrorActions.getEnumValueByKey(errorActionName)
-//            } catch (exception : Exception) { null }
-//        } ?: run { return null }
     }
 }

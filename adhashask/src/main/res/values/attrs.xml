@@ -5,5 +5,7 @@
         <attr name="placeholderDrawable" format="reference" />
         <attr name="errorDrawable" format="reference" />
         <attr name="screenshotUrl" format="string" />
+        <attr name="version" format="string" />
+        <attr name="adTagId" format="string" />
     </declare-styleable>
 </resources>

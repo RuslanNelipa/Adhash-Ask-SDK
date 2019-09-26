@@ -10,10 +10,12 @@ import android.net.Uri
 import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.view.GestureDetectorCompat
 import coil.api.load
 import com.google.gson.GsonBuilder
 import org.adhash.sdk.R
@@ -32,11 +34,13 @@ private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 private const val SCREENSHOT_HANDLER_DELAY = 3000L
 
 class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, attrs) {
+
     private val gson = GsonBuilder()
         .disableHtmlEscaping()
         .create()
 
     private val vm = AdHashVm(
+        context = context,
         systemInfo = SystemInfo(context),
         gpsManager = GpsManager(context),
         adsStorage = AdsStorage(context, gson),
@@ -48,6 +52,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     private var placeholderDrawable: Drawable? = null
     private var errorDrawable: Drawable? = null
     private var screenshotUrl: String? = null
+    private var version: String? = null
+    private var adTagId: String? = null
 
     private var screenshotUrlOpened = false
     private val screenshotHandler = Handler()
@@ -61,7 +67,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         consumeAttrs(attrs)
     }
 
-    /*START VIEW LIFECYCLE*/
     @SuppressLint("DrawAllocation")
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         vm.setBidderProperty(
@@ -85,14 +90,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        val key = "24c1538ded758fe063e362c64e3e486e02d8ec97"
-        val text = "GwPu+0hnf119DdPc0lSXkLWURELm+hju//0osIdwfx0YwIpsZhtIrrPqbwBRQxLB0UhH5LbNhmiMNQyANZ7FYuqrJitHhLiuno72NN/6kKWXetGirlsjN2qu9ikDlxMAgeiXfOULW2iVZVi+JmITmZDx3Pzpm9vlI4Vb5b5IC5VG2klHsRcdNEVybhOeVK1G3XVMXciaC1jYsEaCeXKTLp0gG9GWEbFxQB+V/c3GcDYvGqXCSIH186+Z/+yksNe+tUstf0IrK5vg7IqOtYhJdgWlVxI="
-        Aes.decryptWv(context, text, key)
-        setOnTouchListener { _, motionEvent ->
-            if (motionEvent.action == MotionEvent.ACTION_DOWN)
-                openUri()
-            true
-        }
+        addTouchDetector()
         vm.onAttachedToWindow(
             onBitmapReceived = ::loadAdBitmap,
             onError = ::handleError
@@ -116,12 +114,27 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
             placeholderDrawable = attributes.getDrawable(R.styleable.AdHashView_placeholderDrawable)
             errorDrawable = attributes.getDrawable(R.styleable.AdHashView_errorDrawable)
             screenshotUrl = attributes.getString(R.styleable.AdHashView_screenshotUrl)
+            version = attributes.getString(R.styleable.AdHashView_version)
+            adTagId = attributes.getString(R.styleable.AdHashView_adTagId)
             Log.d(TAG, "Attributes extracted")
 
         } catch (e: Exception) {
             Log.e(TAG, "Failed to read attributes")
         } finally {
             attributes.recycle()
+
+            vm.setUserProperties(
+                adTagId = adTagId,
+                version = version
+            )
+        }
+    }
+
+    private fun addTouchDetector() {
+        setOnTouchListener { _, motionEvent ->
+            if (motionEvent.action == MotionEvent.ACTION_DOWN)
+                openUri()
+            true
         }
     }
 

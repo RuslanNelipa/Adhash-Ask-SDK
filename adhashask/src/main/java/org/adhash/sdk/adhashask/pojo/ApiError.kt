@@ -8,5 +8,5 @@ data class ApiError(
 ) : Throwable()
 
 enum class ApiErrorCase {
-    NoInternet, BadRequest, InternalServerError, Unknown
+    NoInternet, BadRequest, HttpError, Unknown
 }

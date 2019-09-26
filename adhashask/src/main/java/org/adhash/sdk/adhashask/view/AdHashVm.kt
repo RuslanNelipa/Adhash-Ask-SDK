@@ -1,8 +1,8 @@
 package org.adhash.sdk.adhashask.view
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Base64
 import android.util.Log
 import org.adhash.sdk.adhashask.constants.Global
 import org.adhash.sdk.adhashask.ext.safeLet
@@ -10,22 +10,15 @@ import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.*
 import org.adhash.sdk.adhashask.storage.AdsStorage
-import org.adhash.sdk.adhashask.utils.Aes
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
-import java.util.*
-import java.util.Base64.getDecoder
-import javax.crypto.Cipher
-import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.PBEKeySpec
-import javax.crypto.spec.SecretKeySpec
 import kotlin.collections.ArrayList
 
 
 private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
 
 class AdHashVm(
+    private val context: Context,
     private val systemInfo: SystemInfo,
     private val gpsManager: GpsManager,
     private val adsStorage: AdsStorage,
@@ -40,6 +33,8 @@ class AdHashVm(
     private lateinit var onError: (reason: String) -> Unit
 
     private var uri: Uri? = null
+    private var adTagId: String? = null
+    private var version: String? = null
 
     enum class InfoBuildState {
         PublisherId, Gps, Creatives
@@ -47,6 +42,11 @@ class AdHashVm(
 
     init {
         buildInitialAdBidder(systemInfo)
+    }
+
+    fun setUserProperties(adTagId: String?, version: String?) {
+        this.adTagId = adTagId
+        this.version = version
     }
 
     fun setBidderProperty(
@@ -81,14 +81,7 @@ class AdHashVm(
     }
 
     fun onAdDisplayed(recentAd: RecentAd) {
-        adsStorage.saveRecentAd(recentAd
-//            listOf(
-//                recentAd.timestamp.toBigInteger(),
-//                recentAd.advertiserId,
-//                recentAd.campaignId.toBigInteger(),
-//                recentAd.adId
-//            )
-        )
+        adsStorage.saveRecentAd(recentAd)
     }
 
     fun getUri() = uri
@@ -279,12 +272,29 @@ class AdHashVm(
             .let(dataEncryptor::json)
             .let(dataEncryptor::sha1)
 
-        val redirectUrl = dataEncryptor.aes256(url, key)
+        dataEncryptor.aes256(context, url, key,
+            onReceived = {
+                parseUrl(it)
+            }
+        )
 
         Log.d(TAG, "Encrypted URL: $url")
         Log.d(TAG, "Encrypted KEY: $key")
-        Log.d(TAG, "Decrypted URL: $redirectUrl")
+    }
+
+    private fun parseUrl(url: String) {
+        Log.d(TAG, "Decrypted URL: $url")
+
+        uri = Uri.parse(url)
 
     }
+
+    private fun callAnalyticsModule(url: String) {
+        apiClient.callAnalyticsModule(url)
+
+        uri = Uri.parse(url)
+
+    }
+
     private fun String.isAdExpected(expectedHashes: ArrayList<String>): Boolean = this.let(expectedHashes::contains)
 }
