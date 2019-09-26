@@ -280,8 +280,6 @@ class AdHashVm(
             .let(dataEncryptor::sha1)
 
         val redirectUrl = dataEncryptor.aes256(url, key)
-        val test = Aes.decrypt(url, key)
-
 
         Log.d(TAG, "Encrypted URL: $url")
         Log.d(TAG, "Encrypted KEY: $key")

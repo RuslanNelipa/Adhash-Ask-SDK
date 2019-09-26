@@ -1,384 +1,55 @@
 package org.adhash.sdk.adhashask.utils
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
-import android.webkit.ValueCallback
-import android.webkit.WebView
 
-import org.mozilla.javascript.Context
-import org.mozilla.javascript.Function
-import org.mozilla.javascript.Scriptable
+import android.webkit.*
 
 object Aes {
-    private fun cipher(input: String, w: String) = "function cipher($input, $w) {\n" +
-            "        const Nb = 4;               // block size (in words): no of columns in state (fixed at 4 for AES)\n" +
-            "        const Nr = w.length/Nb - 1; // no of rounds: 10/12/14 for 128/192/256-bit keys\n" +
-            "\n" +
-            "        let state = [ [], [], [], [] ];  // initialise 4×Nb byte-array 'state' with input [§3.4]\n" +
-            "        for (let i=0; i<4*Nb; i++) state[i%4][Math.floor(i/4)] = input[i];\n" +
-            "\n" +
-            "        state = addRoundKey(state, w, 0, Nb);\n" +
-            "\n" +
-            "        for (let round=1; round<Nr; round++) {\n" +
-            "            state = subBytes(state, Nb);\n" +
-            "            state = shiftRows(state, Nb);\n" +
-            "            state = mixColumns(state, Nb);\n" +
-            "            state = addRoundKey(state, w, round, Nb);\n" +
-            "        }\n" +
-            "\n" +
-            "        state = subBytes(state, Nb);\n" +
-            "        state = shiftRows(state, Nb);\n" +
-            "        state = addRoundKey(state, w, Nr, Nb);\n" +
-            "\n" +
-            "        const output = new Array(4*Nb);  // convert state to 1-d array before returning [§3.4]\n" +
-            "        for (let i=0; i<4*Nb; i++) output[i] = state[i%4][Math.floor(i/4)];\n" +
-            "\n" +
-            "        return output;\n" +
-            "    }"
+    private fun prepareData(encrypted: String, key: String) =
+        "<!DOCTYPE html>" +
+                "<html>" +
+                "<head>" +
+                "<title></title>" +
+                "</head>" +
+                "<body>" +
+                "" +
+                "</body>" +
+                "<script type=\"text/javascript\">" +
+                "\"use strict\";var _createClass=function(){function n(r,e){for(var t=0;t<e.length;t++){var n=e[t];n.enumerable=n.enumerable||false;n.configurable=true;if(\"value\"in n)n.writable=true;Object.defineProperty(r,n.key,n)}}return function(r,e,t){if(e)n(r.prototype,e);if(t)n(r,t);return r}}();var _typeof=typeof Symbol===\"function\"&&typeof Symbol.iterator===\"symbol\"?function(r){return typeof r}:function(r){return r&&typeof Symbol===\"function\"&&r.constructor===Symbol&&r!==Symbol.prototype?\"symbol\":typeof r};function _classCallCheck(r,e){if(!(r instanceof e)){throw new TypeError(\"Cannot call a class as a function\")}}function _possibleConstructorReturn(r,e){if(!r){throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\")}return e&&(typeof e===\"object\"||typeof e===\"function\")?e:r}function _inherits(r,e){if(typeof e!==\"function\"&&e!==null){throw new TypeError(\"Super expression must either be null or a function, not \"+typeof e)}r.prototype=Object.create(e&&e.prototype,{constructor:{value:r,enumerable:false,writable:true,configurable:true}});if(e)Object.setPrototypeOf?Object.setPrototypeOf(r,e):r.__proto__=e}(function(){function h(o,f,u){function a(t,r){if(!f[t]){if(!o[t]){var e=\"function\"==typeof require&&require;if(!r&&e)return e(t,!0);if(s)return s(t,!0);var n=new Error(\"Cannot find module '\"+t+\"'\");throw n.code=\"MODULE_NOT_FOUND\",n}var i=f[t]={exports:{}};o[t][0].call(i.exports,function(r){var e=o[t][1][r];return a(e||r)},i,i.exports,h,o,f,u)}return f[t].exports}for(var s=\"function\"==typeof require&&require,r=0;r<u.length;r++){a(u[r])}return a}return h})()({1:[function(r,e,t){\"use strict\";t.byteLength=f;t.toByteArray=u;t.fromByteArray=v;var a=[];var s=[];var h=typeof Uint8Array!==\"undefined\"?Uint8Array:Array;var n=\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/\";for(var i=0,o=n.length;i<o;++i){a[i]=n[i];s[n.charCodeAt(i)]=i}s[\"-\".charCodeAt(0)]=62;s[\"_\".charCodeAt(0)]=63;function l(r){var e=r.length;if(e%4>0){throw new Error(\"Invalid string. Length must be a multiple of 4\")}var t=r.indexOf(\"=\");if(t===-1)t=e;var n=t===e?0:4-t%4;return[t,n]}function f(r){var e=l(r);var t=e[0];var n=e[1];return(t+n)*3/4-n}function c(r,e,t){return(e+t)*3/4-t}function u(r){var e;var t=l(r);var n=t[0];var i=t[1];var o=new h(c(r,n,i));var f=0;var u=i>0?n-4:n;for(var a=0;a<u;a+=4){e=s[r.charCodeAt(a)]<<18|s[r.charCodeAt(a+1)]<<12|s[r.charCodeAt(a+2)]<<6|s[r.charCodeAt(a+3)];o[f++]=e>>16&255;o[f++]=e>>8&255;o[f++]=e&255}if(i===2){e=s[r.charCodeAt(a)]<<2|s[r.charCodeAt(a+1)]>>4;o[f++]=e&255}if(i===1){e=s[r.charCodeAt(a)]<<10|s[r.charCodeAt(a+1)]<<4|s[r.charCodeAt(a+2)]>>2;o[f++]=e>>8&255;o[f++]=e&255}return o}function p(r){return a[r>>18&63]+a[r>>12&63]+a[r>>6&63]+a[r&63]}function y(r,e,t){var n;var i=[];for(var o=e;o<t;o+=3){n=(r[o]<<16&16711680)+(r[o+1]<<8&65280)+(r[o+2]&255);i.push(p(n))}return i.join(\"\")}function v(r){var e;var t=r.length;var n=t%3;var i=[];var o=16383;for(var f=0,u=t-n;f<u;f+=o){i.push(y(r,f,f+o>u?u:f+o))}if(n===1){e=r[t-1];i.push(a[e>>2]+a[e<<4&63]+\"==\")}else if(n===2){e=(r[t-2]<<8)+r[t-1];i.push(a[e>>10]+a[e>>4&63]+a[e<<2&63]+\"=\")}return i.join(\"\")}},{}],2:[function(Z,r,H){(function(c){\"use strict\";var n=Z(\"base64-js\");var o=Z(\"ieee754\");H.Buffer=c;H.SlowBuffer=e;H.INSPECT_MAX_BYTES=50;var t=2147483647;H.kMaxLength=t;c.TYPED_ARRAY_SUPPORT=r();if(!c.TYPED_ARRAY_SUPPORT&&typeof console!==\"undefined\"&&typeof console.error===\"function\"){console.error(\"This browser lacks typed array (Uint8Array) support which is required by \"+\"`buffer` v5.x. Use `buffer` v4.x if you require old browser support.\")}function r(){try{var r=new Uint8Array(1);r.__proto__={__proto__:Uint8Array.prototype,foo:function r(){return 42}};return r.foo()===42}catch(r){return false}}Object.defineProperty(c.prototype,\"parent\",{enumerable:true,get:function r(){if(!c.isBuffer(this))return undefined;return this.buffer}});Object.defineProperty(c.prototype,\"offset\",{enumerable:true,get:function r(){if(!c.isBuffer(this))return undefined;return this.byteOffset}});function f(r){if(r>t){throw new RangeError('The value \"'+r+'\" is invalid for option \"size\"')}var e=new Uint8Array(r);e.__proto__=c.prototype;return e}function c(r,e,t){if(typeof r===\"number\"){if(typeof e===\"string\"){throw new TypeError('The \"string\" argument must be of type string. Received type number')}return s(r)}return i(r,e,t)}if(typeof Symbol!==\"undefined\"&&Symbol.species!=null&&c[Symbol.species]===c){Object.defineProperty(c,Symbol.species,{value:null,configurable:true,enumerable:false,writable:false})}c.poolSize=8192;function i(r,e,t){if(typeof r===\"string\"){return h(r,e)}if(ArrayBuffer.isView(r)){return l(r)}if(r==null){throw TypeError(\"The first argument must be one of type string, Buffer, ArrayBuffer, Array, \"+\"or Array-like Object. Received type \"+(typeof r===\"undefined\"?\"undefined\":_typeof(r)))}if(X(r,ArrayBuffer)||r&&X(r.buffer,ArrayBuffer)){return p(r,e,t)}if(typeof r===\"number\"){throw new TypeError('The \"value\" argument must not be of type number. Received type number')}var n=r.valueOf&&r.valueOf();if(n!=null&&n!==r){return c.from(n,e,t)}var i=y(r);if(i)return i;if(typeof Symbol!==\"undefined\"&&Symbol.toPrimitive!=null&&typeof r[Symbol.toPrimitive]===\"function\"){return c.from(r[Symbol.toPrimitive](\"string\"),e,t)}throw new TypeError(\"The first argument must be one of type string, Buffer, ArrayBuffer, Array, \"+\"or Array-like Object. Received type \"+(typeof r===\"undefined\"?\"undefined\":_typeof(r)))}c.from=function(r,e,t){return i(r,e,t)};c.prototype.__proto__=Uint8Array.prototype;c.__proto__=Uint8Array;function u(r){if(typeof r!==\"number\"){throw new TypeError('\"size\" argument must be of type number')}else if(r<0){throw new RangeError('The value \"'+r+'\" is invalid for option \"size\"')}}function a(r,e,t){u(r);if(r<=0){return f(r)}if(e!==undefined){return typeof t===\"string\"?f(r).fill(e,t):f(r).fill(e)}return f(r)}c.alloc=function(r,e,t){return a(r,e,t)};function s(r){u(r);return f(r<0?0:v(r)|0)}c.allocUnsafe=function(r){return s(r)};c.allocUnsafeSlow=function(r){return s(r)};function h(r,e){if(typeof e!==\"string\"||e===\"\"){e=\"utf8\"}if(!c.isEncoding(e)){throw new TypeError(\"Unknown encoding: \"+e)}var t=g(r,e)|0;var n=f(t);var i=n.write(r,e);if(i!==t){n=n.slice(0,i)}return n}function l(r){var e=r.length<0?0:v(r.length)|0;var t=f(e);for(var n=0;n<e;n+=1){t[n]=r[n]&255}return t}function p(r,e,t){if(e<0||r.byteLength<e){throw new RangeError('\"offset\" is outside of buffer bounds')}if(r.byteLength<e+(t||0)){throw new RangeError('\"length\" is outside of buffer bounds')}var n;if(e===undefined&&t===undefined){n=new Uint8Array(r)}else if(t===undefined){n=new Uint8Array(r,e)}else{n=new Uint8Array(r,e,t)}n.__proto__=c.prototype;return n}function y(r){if(c.isBuffer(r)){var e=v(r.length)|0;var t=f(e);if(t.length===0){return t}r.copy(t,0,0,e);return t}if(r.length!==undefined){if(typeof r.length!==\"number\"||J(r.length)){return f(0)}return l(r)}if(r.type===\"Buffer\"&&Array.isArray(r.data)){return l(r.data)}}function v(r){if(r>=t){throw new RangeError(\"Attempt to allocate Buffer larger than maximum \"+\"size: 0x\"+t.toString(16)+\" bytes\")}return r|0}function e(r){if(+r!=r){r=0}return c.alloc(+r)}c.isBuffer=function r(e){return e!=null&&e._isBuffer===true&&e!==c.prototype};c.compare=function r(e,t){if(X(e,Uint8Array))e=c.from(e,e.offset,e.byteLength);if(X(t,Uint8Array))t=c.from(t,t.offset,t.byteLength);if(!c.isBuffer(e)||!c.isBuffer(t)){throw new TypeError('The \"buf1\", \"buf2\" arguments must be one of type Buffer or Uint8Array')}if(e===t)return 0;var n=e.length;var i=t.length;for(var o=0,f=Math.min(n,i);o<f;++o){if(e[o]!==t[o]){n=e[o];i=t[o];break}}if(n<i)return-1;if(i<n)return 1;return 0};c.isEncoding=function r(e){switch(String(e).toLowerCase()){case\"hex\":case\"utf8\":case\"utf-8\":case\"ascii\":case\"latin1\":case\"binary\":case\"base64\":case\"ucs2\":case\"ucs-2\":case\"utf16le\":case\"utf-16le\":return true;default:return false}};c.concat=function r(e,t){if(!Array.isArray(e)){throw new TypeError('\"list\" argument must be an Array of Buffers')}if(e.length===0){return c.alloc(0)}var n;if(t===undefined){t=0;for(n=0;n<e.length;++n){t+=e[n].length}}var i=c.allocUnsafe(t);var o=0;for(n=0;n<e.length;++n){var f=e[n];if(X(f,Uint8Array)){f=c.from(f)}if(!c.isBuffer(f)){throw new TypeError('\"list\" argument must be an Array of Buffers')}f.copy(i,o);o+=f.length}return i};function g(r,e){if(c.isBuffer(r)){return r.length}if(ArrayBuffer.isView(r)||X(r,ArrayBuffer)){return r.byteLength}if(typeof r!==\"string\"){throw new TypeError('The \"string\" argument must be one of type string, Buffer, or ArrayBuffer. '+\"Received type \"+(typeof r===\"undefined\"?\"undefined\":_typeof(r)))}var t=r.length;var n=arguments.length>2&&arguments[2]===true;if(!n&&t===0)return 0;var i=false;for(;;){switch(e){case\"ascii\":case\"latin1\":case\"binary\":return t;case\"utf8\":case\"utf-8\":return F(r).length;case\"ucs2\":case\"ucs-2\":case\"utf16le\":case\"utf-16le\":return t*2;case\"hex\":return t>>>1;case\"base64\":return G(r).length;default:if(i){return n?-1:F(r).length}e=(\"\"+e).toLowerCase();i=true}}}c.byteLength=g;function d(r,e,t){var n=false;if(e===undefined||e<0){e=0}if(e>this.length){return\"\"}if(t===undefined||t>this.length){t=this.length}if(t<=0){return\"\"}t>>>=0;e>>>=0;if(t<=e){return\"\"}if(!r)r=\"utf8\";while(true){switch(r){case\"hex\":return M(this,e,t);case\"utf8\":case\"utf-8\":return k(this,e,t);case\"ascii\":return R(this,e,t);case\"latin1\":case\"binary\":return x(this,e,t);case\"base64\":return U(this,e,t);case\"ucs2\":case\"ucs-2\":case\"utf16le\":case\"utf-16le\":return L(this,e,t);default:if(n)throw new TypeError(\"Unknown encoding: \"+r);r=(r+\"\").toLowerCase();n=true}}}c.prototype._isBuffer=true;function w(r,e,t){var n=r[e];r[e]=r[t];r[t]=n}c.prototype.swap16=function r(){var e=this.length;if(e%2!==0){throw new RangeError(\"Buffer size must be a multiple of 16-bits\")}for(var t=0;t<e;t+=2){w(this,t,t+1)}return this};c.prototype.swap32=function r(){var e=this.length;if(e%4!==0){throw new RangeError(\"Buffer size must be a multiple of 32-bits\")}for(var t=0;t<e;t+=4){w(this,t,t+3);w(this,t+1,t+2)}return this};c.prototype.swap64=function r(){var e=this.length;if(e%8!==0){throw new RangeError(\"Buffer size must be a multiple of 64-bits\")}for(var t=0;t<e;t+=8){w(this,t,t+7);w(this,t+1,t+6);w(this,t+2,t+5);w(this,t+3,t+4)}return this};c.prototype.toString=function r(){var e=this.length;if(e===0)return\"\";if(arguments.length===0)return k(this,0,e);return d.apply(this,arguments)};c.prototype.toLocaleString=c.prototype.toString;c.prototype.equals=function r(e){if(!c.isBuffer(e))throw new TypeError(\"Argument must be a Buffer\");if(this===e)return true;return c.compare(this,e)===0};c.prototype.inspect=function r(){var e=\"\";var t=H.INSPECT_MAX_BYTES;e=this.toString(\"hex\",0,t).replace(/(.{2})/g,\"\$1 \").trim();if(this.length>t)e+=\" ... \";return\"<Buffer \"+e+\">\"};c.prototype.compare=function r(e,t,n,i,o){if(X(e,Uint8Array)){e=c.from(e,e.offset,e.byteLength)}if(!c.isBuffer(e)){throw new TypeError('The \"target\" argument must be one of type Buffer or Uint8Array. '+\"Received type \"+(typeof e===\"undefined\"?\"undefined\":_typeof(e)))}if(t===undefined){t=0}if(n===undefined){n=e?e.length:0}if(i===undefined){i=0}if(o===undefined){o=this.length}if(t<0||n>e.length||i<0||o>this.length){throw new RangeError(\"out of range index\")}if(i>=o&&t>=n){return 0}if(i>=o){return-1}if(t>=n){return 1}t>>>=0;n>>>=0;i>>>=0;o>>>=0;if(this===e)return 0;var f=o-i;var u=n-t;var a=Math.min(f,u);var s=this.slice(i,o);var h=e.slice(t,n);for(var l=0;l<a;++l){if(s[l]!==h[l]){f=s[l];u=h[l];break}}if(f<u)return-1;if(u<f)return 1;return 0};function b(r,e,t,n,i){if(r.length===0)return-1;if(typeof t===\"string\"){n=t;t=0}else if(t>2147483647){t=2147483647}else if(t<-2147483648){t=-2147483648}t=+t;if(J(t)){t=i?0:r.length-1}if(t<0)t=r.length+t;if(t>=r.length){if(i)return-1;else t=r.length-1}else if(t<0){if(i)t=0;else return-1}if(typeof e===\"string\"){e=c.from(e,n)}if(c.isBuffer(e)){if(e.length===0){return-1}return m(r,e,t,n,i)}else if(typeof e===\"number\"){e=e&255;if(typeof Uint8Array.prototype.indexOf===\"function\"){if(i){return Uint8Array.prototype.indexOf.call(r,e,t)}else{return Uint8Array.prototype.lastIndexOf.call(r,e,t)}}return m(r,[e],t,n,i)}throw new TypeError(\"val must be string, number or Buffer\")}function m(r,e,t,n,i){var o=1;var f=r.length;var u=e.length;if(n!==undefined){n=String(n).toLowerCase();if(n===\"ucs2\"||n===\"ucs-2\"||n===\"utf16le\"||n===\"utf-16le\"){if(r.length<2||e.length<2){return-1}o=2;f/=2;u/=2;t/=2}}function a(r,e){if(o===1){return r[e]}else{return r.readUInt16BE(e*o)}}var s;if(i){var h=-1;for(s=t;s<f;s++){if(a(r,s)===a(e,h===-1?0:s-h)){if(h===-1)h=s;if(s-h+1===u)return h*o}else{if(h!==-1)s-=s-h;h=-1}}}else{if(t+u>f)t=f-u;for(s=t;s>=0;s--){var l=true;for(var c=0;c<u;c++){if(a(r,s+c)!==a(e,c)){l=false;break}}if(l)return s}}return-1}c.prototype.includes=function r(e,t,n){return this.indexOf(e,t,n)!==-1};c.prototype.indexOf=function r(e,t,n){return b(this,e,t,n,true)};c.prototype.lastIndexOf=function r(e,t,n){return b(this,e,t,n,false)};function E(r,e,t,n){t=Number(t)||0;var i=r.length-t;if(!n){n=i}else{n=Number(n);if(n>i){n=i}}var o=e.length;if(n>o/2){n=o/2}for(var f=0;f<n;++f){var u=parseInt(e.substr(f*2,2),16);if(J(u))return f;r[t+f]=u}return f}function A(r,e,t,n){return V(F(e,r.length-t),r,t,n)}function B(r,e,t,n){return V(K(e),r,t,n)}function C(r,e,t,n){return B(r,e,t,n)}function _(r,e,t,n){return V(G(e),r,t,n)}function S(r,e,t,n){return V(Y(e,r.length-t),r,t,n)}c.prototype.write=function r(e,t,n,i){if(t===undefined){i=\"utf8\";n=this.length;t=0}else if(n===undefined&&typeof t===\"string\"){i=t;n=this.length;t=0}else if(isFinite(t)){t=t>>>0;if(isFinite(n)){n=n>>>0;if(i===undefined)i=\"utf8\"}else{i=n;n=undefined}}else{throw new Error(\"Buffer.write(string, encoding, offset[, length]) is no longer supported\")}var o=this.length-t;if(n===undefined||n>o)n=o;if(e.length>0&&(n<0||t<0)||t>this.length){throw new RangeError(\"Attempt to write outside buffer bounds\")}if(!i)i=\"utf8\";var f=false;for(;;){switch(i){case\"hex\":return E(this,e,t,n);case\"utf8\":case\"utf-8\":return A(this,e,t,n);case\"ascii\":return B(this,e,t,n);case\"latin1\":case\"binary\":return C(this,e,t,n);case\"base64\":return _(this,e,t,n);case\"ucs2\":case\"ucs-2\":case\"utf16le\":case\"utf-16le\":return S(this,e,t,n);default:if(f)throw new TypeError(\"Unknown encoding: \"+i);i=(\"\"+i).toLowerCase();f=true}}};c.prototype.toJSON=function r(){return{type:\"Buffer\",data:Array.prototype.slice.call(this._arr||this,0)}};function U(r,e,t){if(e===0&&t===r.length){return n.fromByteArray(r)}else{return n.fromByteArray(r.slice(e,t))}}function k(r,e,t){t=Math.min(r.length,t);var n=[];var i=e;while(i<t){var o=r[i];var f=null;var u=o>239?4:o>223?3:o>191?2:1;if(i+u<=t){var a,s,h,l;switch(u){case 1:if(o<128){f=o}break;case 2:a=r[i+1];if((a&192)===128){l=(o&31)<<6|a&63;if(l>127){f=l}}break;case 3:a=r[i+1];s=r[i+2];if((a&192)===128&&(s&192)===128){l=(o&15)<<12|(a&63)<<6|s&63;if(l>2047&&(l<55296||l>57343)){f=l}}break;case 4:a=r[i+1];s=r[i+2];h=r[i+3];if((a&192)===128&&(s&192)===128&&(h&192)===128){l=(o&15)<<18|(a&63)<<12|(s&63)<<6|h&63;if(l>65535&&l<1114112){f=l}}}}if(f===null){f=65533;u=1}else if(f>65535){f-=65536;n.push(f>>>10&1023|55296);f=56320|f&1023}n.push(f);i+=u}return I(n)}var T=4096;function I(r){var e=r.length;if(e<=T){return String.fromCharCode.apply(String,r)}var t=\"\";var n=0;while(n<e){t+=String.fromCharCode.apply(String,r.slice(n,n+=T))}return t}function R(r,e,t){var n=\"\";t=Math.min(r.length,t);for(var i=e;i<t;++i){n+=String.fromCharCode(r[i]&127)}return n}function x(r,e,t){var n=\"\";t=Math.min(r.length,t);for(var i=e;i<t;++i){n+=String.fromCharCode(r[i])}return n}function M(r,e,t){var n=r.length;if(!e||e<0)e=0;if(!t||t<0||t>n)t=n;var i=\"\";for(var o=e;o<t;++o){i+=q(r[o])}return i}function L(r,e,t){var n=r.slice(e,t);var i=\"\";for(var o=0;o<n.length;o+=2){i+=String.fromCharCode(n[o]+n[o+1]*256)}return i}c.prototype.slice=function r(e,t){var n=this.length;e=~~e;t=t===undefined?n:~~t;if(e<0){e+=n;if(e<0)e=0}else if(e>n){e=n}if(t<0){t+=n;if(t<0)t=0}else if(t>n){t=n}if(t<e)t=e;var i=this.subarray(e,t);i.__proto__=c.prototype;return i};function O(r,e,t){if(r%1!==0||r<0)throw new RangeError(\"offset is not uint\");if(r+e>t)throw new RangeError(\"Trying to access beyond buffer length\")}c.prototype.readUIntLE=function r(e,t,n){e=e>>>0;t=t>>>0;if(!n)O(e,t,this.length);var i=this[e];var o=1;var f=0;while(++f<t&&(o*=256)){i+=this[e+f]*o}return i};c.prototype.readUIntBE=function r(e,t,n){e=e>>>0;t=t>>>0;if(!n){O(e,t,this.length)}var i=this[e+--t];var o=1;while(t>0&&(o*=256)){i+=this[e+--t]*o}return i};c.prototype.readUInt8=function r(e,t){e=e>>>0;if(!t)O(e,1,this.length);return this[e]};c.prototype.readUInt16LE=function r(e,t){e=e>>>0;if(!t)O(e,2,this.length);return this[e]|this[e+1]<<8};c.prototype.readUInt16BE=function r(e,t){e=e>>>0;if(!t)O(e,2,this.length);return this[e]<<8|this[e+1]};c.prototype.readUInt32LE=function r(e,t){e=e>>>0;if(!t)O(e,4,this.length);return(this[e]|this[e+1]<<8|this[e+2]<<16)+this[e+3]*16777216};c.prototype.readUInt32BE=function r(e,t){e=e>>>0;if(!t)O(e,4,this.length);return this[e]*16777216+(this[e+1]<<16|this[e+2]<<8|this[e+3])};c.prototype.readIntLE=function r(e,t,n){e=e>>>0;t=t>>>0;if(!n)O(e,t,this.length);var i=this[e];var o=1;var f=0;while(++f<t&&(o*=256)){i+=this[e+f]*o}o*=128;if(i>=o)i-=Math.pow(2,8*t);return i};c.prototype.readIntBE=function r(e,t,n){e=e>>>0;t=t>>>0;if(!n)O(e,t,this.length);var i=t;var o=1;var f=this[e+--i];while(i>0&&(o*=256)){f+=this[e+--i]*o}o*=128;if(f>=o)f-=Math.pow(2,8*t);return f};c.prototype.readInt8=function r(e,t){e=e>>>0;if(!t)O(e,1,this.length);if(!(this[e]&128))return this[e];return(255-this[e]+1)*-1};c.prototype.readInt16LE=function r(e,t){e=e>>>0;if(!t)O(e,2,this.length);var n=this[e]|this[e+1]<<8;return n&32768?n|4294901760:n};c.prototype.readInt16BE=function r(e,t){e=e>>>0;if(!t)O(e,2,this.length);var n=this[e+1]|this[e]<<8;return n&32768?n|4294901760:n};c.prototype.readInt32LE=function r(e,t){e=e>>>0;if(!t)O(e,4,this.length);return this[e]|this[e+1]<<8|this[e+2]<<16|this[e+3]<<24};c.prototype.readInt32BE=function r(e,t){e=e>>>0;if(!t)O(e,4,this.length);return this[e]<<24|this[e+1]<<16|this[e+2]<<8|this[e+3]};c.prototype.readFloatLE=function r(e,t){e=e>>>0;if(!t)O(e,4,this.length);return o.read(this,e,true,23,4)};c.prototype.readFloatBE=function r(e,t){e=e>>>0;if(!t)O(e,4,this.length);return o.read(this,e,false,23,4)};c.prototype.readDoubleLE=function r(e,t){e=e>>>0;if(!t)O(e,8,this.length);return o.read(this,e,true,52,8)};c.prototype.readDoubleBE=function r(e,t){e=e>>>0;if(!t)O(e,8,this.length);return o.read(this,e,false,52,8)};function j(r,e,t,n,i,o){if(!c.isBuffer(r))throw new TypeError('\"buffer\" argument must be a Buffer instance');if(e>i||e<o)throw new RangeError('\"value\" argument is out of bounds');if(t+n>r.length)throw new RangeError(\"Index out of range\")}c.prototype.writeUIntLE=function r(e,t,n,i){e=+e;t=t>>>0;n=n>>>0;if(!i){var o=Math.pow(2,8*n)-1;j(this,e,t,n,o,0)}var f=1;var u=0;this[t]=e&255;while(++u<n&&(f*=256)){this[t+u]=e/f&255}return t+n};c.prototype.writeUIntBE=function r(e,t,n,i){e=+e;t=t>>>0;n=n>>>0;if(!i){var o=Math.pow(2,8*n)-1;j(this,e,t,n,o,0)}var f=n-1;var u=1;this[t+f]=e&255;while(--f>=0&&(u*=256)){this[t+f]=e/u&255}return t+n};c.prototype.writeUInt8=function r(e,t,n){e=+e;t=t>>>0;if(!n)j(this,e,t,1,255,0);this[t]=e&255;return t+1};c.prototype.writeUInt16LE=function r(e,t,n){e=+e;t=t>>>0;if(!n)j(this,e,t,2,65535,0);this[t]=e&255;this[t+1]=e>>>8;return t+2};c.prototype.writeUInt16BE=function r(e,t,n){e=+e;t=t>>>0;if(!n)j(this,e,t,2,65535,0);this[t]=e>>>8;this[t+1]=e&255;return t+2};c.prototype.writeUInt32LE=function r(e,t,n){e=+e;t=t>>>0;if(!n)j(this,e,t,4,4294967295,0);this[t+3]=e>>>24;this[t+2]=e>>>16;this[t+1]=e>>>8;this[t]=e&255;return t+4};c.prototype.writeUInt32BE=function r(e,t,n){e=+e;t=t>>>0;if(!n)j(this,e,t,4,4294967295,0);this[t]=e>>>24;this[t+1]=e>>>16;this[t+2]=e>>>8;this[t+3]=e&255;return t+4};c.prototype.writeIntLE=function r(e,t,n,i){e=+e;t=t>>>0;if(!i){var o=Math.pow(2,8*n-1);j(this,e,t,n,o-1,-o)}var f=0;var u=1;var a=0;this[t]=e&255;while(++f<n&&(u*=256)){if(e<0&&a===0&&this[t+f-1]!==0){a=1}this[t+f]=(e/u>>0)-a&255}return t+n};c.prototype.writeIntBE=function r(e,t,n,i){e=+e;t=t>>>0;if(!i){var o=Math.pow(2,8*n-1);j(this,e,t,n,o-1,-o)}var f=n-1;var u=1;var a=0;this[t+f]=e&255;while(--f>=0&&(u*=256)){if(e<0&&a===0&&this[t+f+1]!==0){a=1}this[t+f]=(e/u>>0)-a&255}return t+n};c.prototype.writeInt8=function r(e,t,n){e=+e;t=t>>>0;if(!n)j(this,e,t,1,127,-128);if(e<0)e=255+e+1;this[t]=e&255;return t+1};c.prototype.writeInt16LE=function r(e,t,n){e=+e;t=t>>>0;if(!n)j(this,e,t,2,32767,-32768);this[t]=e&255;this[t+1]=e>>>8;return t+2};c.prototype.writeInt16BE=function r(e,t,n){e=+e;t=t>>>0;if(!n)j(this,e,t,2,32767,-32768);this[t]=e>>>8;this[t+1]=e&255;return t+2};c.prototype.writeInt32LE=function r(e,t,n){e=+e;t=t>>>0;if(!n)j(this,e,t,4,2147483647,-2147483648);this[t]=e&255;this[t+1]=e>>>8;this[t+2]=e>>>16;this[t+3]=e>>>24;return t+4};c.prototype.writeInt32BE=function r(e,t,n){e=+e;t=t>>>0;if(!n)j(this,e,t,4,2147483647,-2147483648);if(e<0)e=4294967295+e+1;this[t]=e>>>24;this[t+1]=e>>>16;this[t+2]=e>>>8;this[t+3]=e&255;return t+4};function P(r,e,t,n,i,o){if(t+n>r.length)throw new RangeError(\"Index out of range\");if(t<0)throw new RangeError(\"Index out of range\")}function N(r,e,t,n,i){e=+e;t=t>>>0;if(!i){P(r,e,t,4,34028234663852886e22,-34028234663852886e22)}o.write(r,e,t,n,23,4);return t+4}c.prototype.writeFloatLE=function r(e,t,n){return N(this,e,t,true,n)};c.prototype.writeFloatBE=function r(e,t,n){return N(this,e,t,false,n)};function D(r,e,t,n,i){e=+e;t=t>>>0;if(!i){P(r,e,t,8,17976931348623157e292,-17976931348623157e292)}o.write(r,e,t,n,52,8);return t+8}c.prototype.writeDoubleLE=function r(e,t,n){return D(this,e,t,true,n)};c.prototype.writeDoubleBE=function r(e,t,n){return D(this,e,t,false,n)};c.prototype.copy=function r(e,t,n,i){if(!c.isBuffer(e))throw new TypeError(\"argument should be a Buffer\");if(!n)n=0;if(!i&&i!==0)i=this.length;if(t>=e.length)t=e.length;if(!t)t=0;if(i>0&&i<n)i=n;if(i===n)return 0;if(e.length===0||this.length===0)return 0;if(t<0){throw new RangeError(\"targetStart out of bounds\")}if(n<0||n>=this.length)throw new RangeError(\"Index out of range\");if(i<0)throw new RangeError(\"sourceEnd out of bounds\");if(i>this.length)i=this.length;if(e.length-t<i-n){i=e.length-t+n}var o=i-n;if(this===e&&typeof Uint8Array.prototype.copyWithin===\"function\"){this.copyWithin(t,n,i)}else if(this===e&&n<t&&t<i){for(var f=o-1;f>=0;--f){e[f+t]=this[f+n]}}else{Uint8Array.prototype.set.call(e,this.subarray(n,i),t)}return o};c.prototype.fill=function r(e,t,n,i){if(typeof e===\"string\"){if(typeof t===\"string\"){i=t;t=0;n=this.length}else if(typeof n===\"string\"){i=n;n=this.length}if(i!==undefined&&typeof i!==\"string\"){throw new TypeError(\"encoding must be a string\")}if(typeof i===\"string\"&&!c.isEncoding(i)){throw new TypeError(\"Unknown encoding: \"+i)}if(e.length===1){var o=e.charCodeAt(0);if(i===\"utf8\"&&o<128||i===\"latin1\"){e=o}}}else if(typeof e===\"number\"){e=e&255}if(t<0||this.length<t||this.length<n){throw new RangeError(\"Out of range index\")}if(n<=t){return this}t=t>>>0;n=n===undefined?this.length:n>>>0;if(!e)e=0;var f;if(typeof e===\"number\"){for(f=t;f<n;++f){this[f]=e}}else{var u=c.isBuffer(e)?e:c.from(e,i);var a=u.length;if(a===0){throw new TypeError('The value \"'+e+'\" is invalid for argument \"value\"')}for(f=0;f<n-t;++f){this[f+t]=u[f%a]}}return this};var z=/[^+/0-9A-Za-z-_]/g;function W(r){r=r.split(\"=\")[0];r=r.trim().replace(z,\"\");if(r.length<2)return\"\";while(r.length%4!==0){r=r+\"=\"}return r}function q(r){if(r<16)return\"0\"+r.toString(16);return r.toString(16)}function F(r,e){e=e||Infinity;var t;var n=r.length;var i=null;var o=[];for(var f=0;f<n;++f){t=r.charCodeAt(f);if(t>55295&&t<57344){if(!i){if(t>56319){if((e-=3)>-1)o.push(239,191,189);continue}else if(f+1===n){if((e-=3)>-1)o.push(239,191,189);continue}i=t;continue}if(t<56320){if((e-=3)>-1)o.push(239,191,189);i=t;continue}t=(i-55296<<10|t-56320)+65536}else if(i){if((e-=3)>-1)o.push(239,191,189)}i=null;if(t<128){if((e-=1)<0)break;o.push(t)}else if(t<2048){if((e-=2)<0)break;o.push(t>>6|192,t&63|128)}else if(t<65536){if((e-=3)<0)break;o.push(t>>12|224,t>>6&63|128,t&63|128)}else if(t<1114112){if((e-=4)<0)break;o.push(t>>18|240,t>>12&63|128,t>>6&63|128,t&63|128)}else{throw new Error(\"Invalid code point\")}}return o}function K(r){var e=[];for(var t=0;t<r.length;++t){e.push(r.charCodeAt(t)&255)}return e}function Y(r,e){var t,n,i;var o=[];for(var f=0;f<r.length;++f){if((e-=2)<0)break;t=r.charCodeAt(f);n=t>>8;i=t%256;o.push(i);o.push(n)}return o}function G(r){return n.toByteArray(W(r))}function V(r,e,t,n){for(var i=0;i<n;++i){if(i+t>=e.length||i>=r.length)break;e[i+t]=r[i]}return i}function X(r,e){return r instanceof e||r!=null&&r.constructor!=null&&r.constructor.name!=null&&r.constructor.name===e.name}function J(r){return r!==r}}).call(this,Z(\"buffer\").Buffer)},{\"base64-js\":1,buffer:2,ieee754:3}],3:[function(r,e,t){t.read=function(r,e,t,n,i){var o,f;var u=i*8-n-1;var a=(1<<u)-1;var s=a>>1;var h=-7;var l=t?i-1:0;var c=t?-1:1;var p=r[e+l];l+=c;o=p&(1<<-h)-1;p>>=-h;h+=u;for(;h>0;o=o*256+r[e+l],l+=c,h-=8){}f=o&(1<<-h)-1;o>>=-h;h+=n;for(;h>0;f=f*256+r[e+l],l+=c,h-=8){}if(o===0){o=1-s}else if(o===a){return f?NaN:(p?-1:1)*Infinity}else{f=f+Math.pow(2,n);o=o-s}return(p?-1:1)*f*Math.pow(2,o-n)};t.write=function(r,e,t,n,i,o){var f,u,a;var s=o*8-i-1;var h=(1<<s)-1;var l=h>>1;var c=i===23?Math.pow(2,-24)-Math.pow(2,-77):0;var p=n?0:o-1;var y=n?1:-1;var v=e<0||e===0&&1/e<0?1:0;e=Math.abs(e);if(isNaN(e)||e===Infinity){u=isNaN(e)?1:0;f=h}else{f=Math.floor(Math.log(e)/Math.LN2);if(e*(a=Math.pow(2,-f))<1){f--;a*=2}if(f+l>=1){e+=c/a}else{e+=c*Math.pow(2,1-l)}if(e*a>=2){f++;a/=2}if(f+l>=h){u=0;f=h}else if(f+l>=1){u=(e*a-1)*Math.pow(2,i);f=f+l}else{u=e*Math.pow(2,l-1)*Math.pow(2,i);f=0}}for(;i>=8;r[t+p]=u&255,p+=y,u/=256,i-=8){}f=f<<i|u;s+=i;for(;s>0;r[t+p]=f&255,p+=y,f/=256,s-=8){}r[t+p-y]|=v*128}},{}],4:[function(e,n,r){(function(t){\"use strict\";var I=e(\"./aes.js\");var r=function(r){_inherits(T,r);function T(){_classCallCheck(this,T);return _possibleConstructorReturn(this,(T.__proto__||Object.getPrototypeOf(T)).apply(this,arguments))}_createClass(T,null,[{key:\"encrypt\",value:function r(e,t,n){var i=16;if(!(n==128||n==192||n==256))throw new Error(\"Key size is not 128 / 192 / 256\");e=T.utf8Encode(String(e));t=T.utf8Encode(String(t));var o=n/8;var f=new Array(o);for(var u=0;u<o;u++){f[u]=u<t.length?t.charCodeAt(u):0}var a=I.cipher(f,I.keyExpansion(f));a=a.concat(a.slice(0,o-16));var s=new Array(i);var h=(new Date).getTime();var l=h%1e3;var c=Math.floor(h/1e3);var p=Math.floor(Math.random()*65535);for(var y=0;y<2;y++){s[y]=l>>>y*8&255}for(var v=0;v<2;v++){s[v+2]=p>>>v*8&255}for(var g=0;g<4;g++){s[g+4]=c>>>g*8&255}var d=\"\";for(var w=0;w<8;w++){d+=String.fromCharCode(s[w])}var b=I.keyExpansion(a);var m=Math.ceil(e.length/i);var E=\"\";for(var A=0;A<m;A++){for(var B=0;B<4;B++){s[15-B]=A>>>B*8&255}for(var C=0;C<4;C++){s[15-C-4]=A/4294967296>>>C*8}var _=I.cipher(s,b);var S=A<m-1?i:(e.length-1)%i+1;var U=new Array(S);for(var k=0;k<S;k++){U[k]=_[k]^e.charCodeAt(A*i+k);U[k]=String.fromCharCode(U[k])}E+=U.join(\"\");if(typeof WorkerGlobalScope!=\"undefined\"&&self instanceof WorkerGlobalScope){if(A%1e3==0)self.postMessage({progress:A/m})}}E=T.base64Encode(d+E);return E}},{key:\"decrypt\",value:function r(e,t,n){var i=16;if(!(n==128||n==192||n==256))throw new Error(\"Key size is not 128 / 192 / 256\");e=T.base64Decode(String(e));t=T.utf8Encode(String(t));var o=n/8;var f=new Array(o);for(var u=0;u<o;u++){f[u]=u<t.length?t.charCodeAt(u):0}var a=I.cipher(f,I.keyExpansion(f));a=a.concat(a.slice(0,o-16));var s=new Array(8);var h=e.slice(0,8);for(var l=0;l<8;l++){s[l]=h.charCodeAt(l)}var c=I.keyExpansion(a);var p=Math.ceil((e.length-8)/i);var y=new Array(p);for(var v=0;v<p;v++){y[v]=e.slice(8+v*i,8+v*i+i)}e=y;var g=\"\";for(var d=0;d<p;d++){for(var w=0;w<4;w++){s[15-w]=d>>>w*8&255}for(var b=0;b<4;b++){s[15-b-4]=(d+1)/4294967296-1>>>b*8&255}var m=I.cipher(s,c);var E=new Array(e[d].length);for(var A=0;A<e[d].length;A++){E[A]=m[A]^e[d].charCodeAt(A);E[A]=String.fromCharCode(E[A])}g+=E.join(\"\");if(typeof WorkerGlobalScope!=\"undefined\"&&self instanceof WorkerGlobalScope){if(d%1e3==0)self.postMessage({progress:d/p})}}g=T.utf8Decode(g);return g}},{key:\"utf8Encode\",value:function r(e){try{return(new TextEncoder).encode(e,\"utf-8\").reduce(function(r,e){return r+String.fromCharCode(e)},\"\")}catch(r){return unescape(encodeURIComponent(e))}}},{key:\"utf8Decode\",value:function r(e){try{return(new TextEncoder).decode(e,\"utf-8\").reduce(function(r,e){return r+String.fromCharCode(e)},\"\")}catch(r){return decodeURIComponent(escape(e))}}},{key:\"base64Encode\",value:function r(e){if(typeof btoa!=\"undefined\")return btoa(e);if(typeof t!=\"undefined\")return new t(e,\"binary\").toString(\"base64\");throw new Error(\"No Base64 Encode\")}},{key:\"base64Decode\",value:function r(e){if(typeof atob!=\"undefined\")return atob(e);if(typeof t!=\"undefined\")return new t(e,\"base64\").toString(\"binary\");throw new Error(\"No Base64 Decode\")}}]);return T}(I);n.exports=r}).call(this,e(\"buffer\").Buffer)},{\"./aes.js\":5,buffer:2}],5:[function(r,e,t){\"use strict\";var n=function(){function p(){_classCallCheck(this,p)}_createClass(p,null,[{key:\"cipher\",value:function r(e,t){var n=4;var i=t.length/n-1;var o=[[],[],[],[]];for(var f=0;f<4*n;f++){o[f%4][Math.floor(f/4)]=e[f]}o=p.addRoundKey(o,t,0,n);for(var u=1;u<i;u++){o=p.subBytes(o,n);o=p.shiftRows(o,n);o=p.mixColumns(o,n);o=p.addRoundKey(o,t,u,n)}o=p.subBytes(o,n);o=p.shiftRows(o,n);o=p.addRoundKey(o,t,i,n);var a=new Array(4*n);for(var s=0;s<4*n;s++){a[s]=o[s%4][Math.floor(s/4)]}return a}},{key:\"keyExpansion\",value:function r(e){var t=4;var n=e.length/4;var i=n+6;var o=new Array(t*(i+1));var f=new Array(4);for(var u=0;u<n;u++){var a=[e[4*u],e[4*u+1],e[4*u+2],e[4*u+3]];o[u]=a}for(var s=n;s<t*(i+1);s++){o[s]=new Array(4);for(var h=0;h<4;h++){f[h]=o[s-1][h]}if(s%n==0){f=p.subWord(p.rotWord(f));for(var l=0;l<4;l++){f[l]^=p.rCon[s/n][l]}}else if(n>6&&s%n==4){f=p.subWord(f)}for(var c=0;c<4;c++){o[s][c]=o[s-n][c]^f[c]}}return o}},{key:\"subBytes\",value:function r(e,t){for(var n=0;n<4;n++){for(var i=0;i<t;i++){e[n][i]=p.sBox[e[n][i]]}}return e}},{key:\"shiftRows\",value:function r(e,t){var n=new Array(4);for(var i=1;i<4;i++){for(var o=0;o<4;o++){n[o]=e[i][(o+i)%t]}for(var f=0;f<4;f++){e[i][f]=n[f]}}return e}},{key:\"mixColumns\",value:function r(e,t){for(var n=0;n<t;n++){var i=new Array(t);var o=new Array(t);for(var f=0;f<4;f++){i[f]=e[f][n];o[f]=e[f][n]&128?e[f][n]<<1^283:e[f][n]<<1}e[0][n]=o[0]^i[1]^o[1]^i[2]^i[3];e[1][n]=i[0]^o[1]^i[2]^o[2]^i[3];e[2][n]=i[0]^i[1]^o[2]^i[3]^o[3];e[3][n]=i[0]^o[0]^i[1]^i[2]^o[3]}return e}},{key:\"addRoundKey\",value:function r(e,t,n,i){for(var o=0;o<4;o++){for(var f=0;f<i;f++){e[o][f]^=t[n*4+f][o]}}return e}},{key:\"subWord\",value:function r(e){for(var t=0;t<4;t++){e[t]=p.sBox[e[t]]}return e}},{key:\"rotWord\",value:function r(e){var t=e[0];for(var n=0;n<3;n++){e[n]=e[n+1]}e[3]=t;return e}}]);return p}();n.sBox=[99,124,119,123,242,107,111,197,48,1,103,43,254,215,171,118,202,130,201,125,250,89,71,240,173,212,162,175,156,164,114,192,183,253,147,38,54,63,247,204,52,165,229,241,113,216,49,21,4,199,35,195,24,150,5,154,7,18,128,226,235,39,178,117,9,131,44,26,27,110,90,160,82,59,214,179,41,227,47,132,83,209,0,237,32,252,177,91,106,203,190,57,74,76,88,207,208,239,170,251,67,77,51,133,69,249,2,127,80,60,159,168,81,163,64,143,146,157,56,245,188,182,218,33,16,255,243,210,205,12,19,236,95,151,68,23,196,167,126,61,100,93,25,115,96,129,79,220,34,42,144,136,70,238,184,20,222,94,11,219,224,50,58,10,73,6,36,92,194,211,172,98,145,149,228,121,231,200,55,109,141,213,78,169,108,86,244,234,101,122,174,8,186,120,37,46,28,166,180,198,232,221,116,31,75,189,139,138,112,62,181,102,72,3,246,14,97,53,87,185,134,193,29,158,225,248,152,17,105,217,142,148,155,30,135,233,206,85,40,223,140,161,137,13,191,230,66,104,65,153,45,15,176,84,187,22];n.rCon=[[0,0,0,0],[1,0,0,0],[2,0,0,0],[4,0,0,0],[8,0,0,0],[16,0,0,0],[32,0,0,0],[64,0,0,0],[128,0,0,0],[27,0,0,0],[54,0,0,0]];e.exports=n},{}],6:[function(r,e,t){var n=r(\"./aes-ctr.js\");window.decrypt=function(r,e){return n.decrypt(r,e,256)}},{\"./aes-ctr.js\":4}]},{},[6]);" +
+                "" +
+                "</script>" +
+                "<script type=\"text/javascript\">" +
+                "let encrypted = \"$encrypted\";" +
+                "let key = \"$key\";" +
+                "" +
+                "document.addEventListener(\"DOMContentLoaded\", function() {" +
+                "let text = \"DECRYPTED: \" + window.decrypt(encrypted, key);" +
+                "   document.querySelector('body').innerText = text;" +
+                "   console.log(text);" +
+                "});" +
+                "" +
+                "</script>" +
+                "</html>"
 
-    private fun addRoundKey(state: String, w: String, rnd: String, Nb: String)= "function addRoundKey($state, $w, $rnd, $Nb) {\n" +
-            "        for (let r=0; r<4; r++) {\n" +
-            "            for (let c=0; c<Nb; c++) state[r][c] ^= w[rnd*4+c][r];\n" +
-            "        }\n" +
-            "        return state;\n" +
-            "    }"
-
-    private fun subBytes(s: String, Nb: String)= "function subBytes($s, $Nb) {\n" +
-            "        for (let r=0; r<4; r++) {\n" +
-            "            for (let c=0; c<Nb; c++) s[r][c] = Aes.sBox[s[r][c]];\n" +
-            "        }\n" +
-            "        return s;\n" +
-            "    }"
-
-    private fun shiftRows(s: String, Nb: String) = "function  shiftRows($s, $Nb) {\n" +
-            "        const t = new Array(4);\n" +
-            "        for (let r=1; r<4; r++) {\n" +
-            "            for (let c=0; c<4; c++) t[c] = s[r][(c+r)%Nb];  \n" +
-            "            for (let c=0; c<4; c++) s[r][c] = t[c];       \n" +
-            "        }          \n" +
-            "        return s; \n" +
-            "    }"
-
-    private fun mixColumns(s: String, Nb: String) ="function mixColumns($s, $Nb) {\n" +
-            "        for (let c=0; c<Nb; c++) {\n" +
-            "            const a = new Array(Nb);  // 'a' is a copy of the current column from 's'\n" +
-            "            const b = new Array(Nb);  // 'b' is a•{02} in GF(2^8)\n" +
-            "            for (let r=0; r<4; r++) {\n" +
-            "                a[r] = s[r][c];\n" +
-            "                b[r] = s[r][c]&0x80 ? s[r][c]<<1 ^ 0x011b : s[r][c]<<1;\n" +
-            "            }\n" +
-            "            // a[n] ^ b[n] is a•{03} in GF(2^8)\n" +
-            "            s[0][c] = b[0] ^ a[1] ^ b[1] ^ a[2] ^ a[3]; // {02}•a0 + {03}•a1 + a2 + a3\n" +
-            "            s[1][c] = a[0] ^ b[1] ^ a[2] ^ b[2] ^ a[3]; // a0 • {02}•a1 + {03}•a2 + a3\n" +
-            "            s[2][c] = a[0] ^ a[1] ^ b[2] ^ a[3] ^ b[3]; // a0 + a1 + {02}•a2 + {03}•a3\n" +
-            "            s[3][c] = a[0] ^ b[0] ^ a[1] ^ a[2] ^ b[3]; // {03}•a0 + a1 + a2 + {02}•a3\n" +
-            "        }\n" +
-            "        return s;\n" +
-            "    }"
-
-    private fun base64Decode(str: String) = "function base64Decode($str) {\n" +
-            "        if (typeof atob != 'undefined') return atob(str); // browser\n" +
-            "        if (typeof Buffer != 'undefined') return new Buffer(str, 'base64').toString('binary'); // Node.js\n" +
-            "        throw new Error('No Base64 Decode');\n" +
-            "    }"
-
-
-    private fun utf8Encode(str: String) = "function utf8Encode($str) {\n" +
-            "        try {\n" +
-            "            return new TextEncoder().encode(str, 'utf-8').reduce((prev, curr) => prev + String.fromCharCode(curr), '');\n" +
-            "        } catch (e) { // no TextEncoder available?\n" +
-            "            return unescape(encodeURIComponent(str)); // monsur.hossa.in/2012/07/20/utf-8-in-javascript.html\n" +
-            "        }\n" +
-            "    }"
-
-    private fun utf8Decode(str: String) = "function utf8Decode($str) {\n" +
-            "        try {\n" +
-            "            return new TextEncoder().decode(str, 'utf-8').reduce((prev, curr) => prev + String.fromCharCode(curr), '');\n" +
-            "        } catch (e) { // no TextEncoder available?\n" +
-            "            return decodeURIComponent(escape(str)); // monsur.hossa.in/2012/07/20/utf-8-in-javascript.html\n" +
-            "        }\n" +
-            "    }"
-
-    private fun subWord(w: String) = "static subWord($w) {\n" +
-            "        for (let i=0; i<4; i++) w[i] = Aes.sBox[w[i]];\n" +
-            "        return w;\n" +
-            "    }"
-
-    private fun rotWord(w: String) = "static rotWord($w) {\n" +
-            "        const tmp = w[0];\n" +
-            "        for (let i=0; i<3; i++) w[i] = w[i+1];\n" +
-            "        w[3] = tmp;\n" +
-            "        return w;\n" +
-            "    }"
-
-    private fun decrypt(a:String,b:String,c:String) = "function decrypt($a,$b,$c){function d(a,b){const c=4,d=b.length/4-1;let e=[[],[],[],[]];for(let c=0;c<16;c++)e[c%4][Math.floor(c/4)]=a[c];e=i(e,b,0,4);for(let j=1;j<d;j++)e=f(e,c),e=g(e,c),e=h(e,c),e=i(e,b,j,c);e=f(e,4),e=g(e,4),e=i(e,b,d,4);const j=Array(16);for(let c=0;c<16;c++)j[c]=e[c%4][Math.floor(c/4)];return j}function e(a){const b=a.length/4,c=b+6,d=Array(4*(c+1));let e=[,,,,];for(let c=0;c<b;c++){const b=[a[4*c],a[4*c+1],a[4*c+2],a[4*c+3]];d[c]=b}for(let f=b;f<4*(c+1);f++){d[f]=[,,,,];for(let a=0;4>a;a++)e[a]=d[f-1][a];if(0==f%b){e=j(k(e));for(let a=0;4>a;a++)e[a]^=n[f/b][a]}else 6<b&&4==f%b&&(e=j(e));for(let a=0;4>a;a++)d[f][a]=d[f-b][a]^e[a]}return d}function f(a,b){for(let d=0;4>d;d++)for(let e=0;e<b;e++)a[d][e]=m[a[d][e]];return a}function g(a,b){const d=[,,,,];for(let e=1;4>e;e++){for(let f=0;4>f;f++)d[f]=a[e][(f+e)%b];for(let b=0;4>b;b++)a[e][b]=d[b]}return a}function h(d,e){for(let f=0;f<e;f++){const c=Array(e),a=Array(e);for(let b=0;4>b;b++)c[b]=d[b][f],a[b]=128&d[b][f]?283^d[b][f]<<1:d[b][f]<<1;d[0][f]=a[0]^c[1]^a[1]^c[2]^c[3],d[1][f]=c[0]^a[1]^c[2]^a[2]^c[3],d[2][f]=c[0]^c[1]^a[2]^c[3]^a[3],d[3][f]=c[0]^a[0]^c[1]^c[2]^a[3]}return d}function i(a,b,d,e){for(let f=0;4>f;f++)for(let g=0;g<e;g++)a[f][g]^=b[4*d+g][f];return a}function j(a){for(let b=0;4>b;b++)a[b]=m[a[b]];return a}function k(a){const b=a[0];for(let b=0;3>b;b++)a[b]=a[b+1];return a[3]=b,a}function l(a,b,c){const f=16,g=e(b),h=Math.ceil(a.length/16),j=Array(a.length);for(let e=0;e<h;e++){const b=d(c,g),k=e<h-1?f:(a.length-1)%f+1;for(let c=0;c<k;c++)j[e*f+c]=b[c]^a[e*f+c];c[15]++;for(let a=15;8<=a;a--)c[a-1]+=c[a]>>8,c[a]&=255;\"undefined\"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope&&0==e%1e3&&self.postMessage({progress:e/h})}return j}const m=[99,124,119,123,242,107,111,197,48,1,103,43,254,215,171,118,202,130,201,125,250,89,71,240,173,212,162,175,156,164,114,192,183,253,147,38,54,63,247,204,52,165,229,241,113,216,49,21,4,199,35,195,24,150,5,154,7,18,128,226,235,39,178,117,9,131,44,26,27,110,90,160,82,59,214,179,41,227,47,132,83,209,0,237,32,252,177,91,106,203,190,57,74,76,88,207,208,239,170,251,67,77,51,133,69,249,2,127,80,60,159,168,81,163,64,143,146,157,56,245,188,182,218,33,16,255,243,210,205,12,19,236,95,151,68,23,196,167,126,61,100,93,25,115,96,129,79,220,34,42,144,136,70,238,184,20,222,94,11,219,224,50,58,10,73,6,36,92,194,211,172,98,145,149,228,121,231,200,55,109,141,213,78,169,108,86,244,234,101,122,174,8,186,120,37,46,28,166,180,198,232,221,116,31,75,189,139,138,112,62,181,102,72,3,246,14,97,53,87,185,134,193,29,158,225,248,152,17,105,217,142,148,155,30,135,233,206,85,40,223,140,161,137,13,191,230,66,104,65,153,45,15,176,84,187,22],n=[[0,0,0,0],[1,0,0,0],[2,0,0,0],[4,0,0,0],[8,0,0,0],[16,0,0,0],[32,0,0,0],[64,0,0,0],[128,0,0,0],[27,0,0,0],[54,0,0,0]];if(![128,192,256].includes(c))throw new Error(\"Key size is not 128 / 192 / 256\");a=function(a){if(\"undefined\"!=typeof atob)return atob(a);if(\"undefined\"!=typeof Buffer)return new Buffer(a,\"base64\").toString(\"binary\");throw new Error(\"No Base64 Decode\")}(a+\"\"),b=function(a){try{return new TextEncoder().encode(a,\"utf-8\").reduce((a,b)=>a+String.fromCharCode(b),\"\")}catch(b){return unescape(encodeURIComponent(a))}}(b+\"\");const o=c/8,p=Array(o);for(let d=0;d<o;d++)p[d]=d<b.length?b.charCodeAt(d):0;let q=d(p,e(p));q=q.concat(q.slice(0,o-16));const r=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];for(let d=0;8>d;d++)r[d]=a.charCodeAt(d);const s=Array(a.length-8);for(let d=8;d<a.length;d++)s[d-8]=a.charCodeAt(d);const t=l(s,q,r),u=t.map(a=>String.fromCharCode(a)).join(\"\"),v=function(a){try{return new TextEncoder().decode(a,\"utf-8\").reduce((a,b)=>a+String.fromCharCode(b),\"\")}catch(b){return decodeURIComponent(escape(a))}}(u);return v}"
-
-    private fun decryptFull(ciphertext: String, password: String, nBits: String) = "function decrypt(ciphertext, password, nBits) {\n" +
-            "\n" +
-            "  function cipher(input, w) {\n" +
-            "    const Nb = 4; // block size (in words): no of columns in state (fixed at 4 for AES)\n" +
-            "    const Nr = w.length / Nb - 1; // no of rounds: 10/12/14 for 128/192/256-bit keys\n" +
-            "\n" +
-            "    let state = [[], [], [], []]; // initialise 4×Nb byte-array 'state' with input [§3.4]\n" +
-            "    for (let i = 0; i < 4 * Nb; i++) state[i % 4][Math.floor(i / 4)] = input[i];\n" +
-            "\n" +
-            "    state = addRoundKey(state, w, 0, Nb);\n" +
-            "\n" +
-            "    for (let round = 1; round < Nr; round++) {\n" +
-            "      state = subBytes(state, Nb);\n" +
-            "      state = shiftRows(state, Nb);\n" +
-            "      state = mixColumns(state, Nb);\n" +
-            "      state = addRoundKey(state, w, round, Nb);\n" +
-            "    }\n" +
-            "\n" +
-            "    state = subBytes(state, Nb);\n" +
-            "    state = shiftRows(state, Nb);\n" +
-            "    state = addRoundKey(state, w, Nr, Nb);\n" +
-            "\n" +
-            "    const output = new Array(4 * Nb);\n" +
-            "    for (let i = 0; i < 4 * Nb; i++) output[i] = state[i % 4][Math.floor(i / 4)];\n" +
-            "\n" +
-            "    return output;\n" +
-            "  }\n" +
-            "\n" +
-            "  function keyExpansion(key) {\n" +
-            "    const Nb = 4;\n" +
-            "    const Nk = key.length / 4;\n" +
-            "    const Nr = Nk + 6;\n" +
-            "\n" +
-            "    const w = new Array(Nb * (Nr + 1));\n" +
-            "    let temp = new Array(4);\n" +
-            "\n" +
-            "\n" +
-            "    for (let i = 0; i < Nk; i++) {\n" +
-            "      const r = [key[4 * i], key[4 * i + 1], key[4 * i + 2], key[4 * i + 3]];\n" +
-            "      w[i] = r;\n" +
-            "    }\n" +
-            "\n" +
-            "\n" +
-            "    for (let i = Nk; i < (Nb * (Nr + 1)); i++) {\n" +
-            "      w[i] = new Array(4);\n" +
-            "      for (let t = 0; t < 4; t++) temp[t] = w[i - 1][t];\n" +
-            "\n" +
-            "      if (i % Nk == 0) {\n" +
-            "        temp = subWord(rotWord(temp));\n" +
-            "        for (let t = 0; t < 4; t++) temp[t] ^= rCon[i / Nk][t];\n" +
-            "      } else if (Nk > 6 && i % Nk == 4) {\n" +
-            "        temp = subWord(temp);\n" +
-            "      }\n" +
-            "\n" +
-            "      for (let t = 0; t < 4; t++) w[i][t] = w[i - Nk][t] ^ temp[t];\n" +
-            "    }\n" +
-            "\n" +
-            "    return w;\n" +
-            "  }\n" +
-            "\n" +
-            "  function subBytes(s, Nb) {\n" +
-            "    for (let r = 0; r < 4; r++) {\n" +
-            "      for (let c = 0; c < Nb; c++) s[r][c] = sBox[s[r][c]];\n" +
-            "    }\n" +
-            "    return s;\n" +
-            "  }\n" +
-            "\n" +
-            "  function shiftRows(s, Nb) {\n" +
-            "    const t = new Array(4);\n" +
-            "    for (let r = 1; r < 4; r++) {\n" +
-            "      for (let c = 0; c < 4; c++) t[c] = s[r][(c + r) % Nb];\n" +
-            "      for (let c = 0; c < 4; c++) s[r][c] = t[c];\n" +
-            "    }\n" +
-            "    return s;\n" +
-            "  }\n" +
-            "\n" +
-            "  function mixColumns(s, Nb) {\n" +
-            "    for (let c = 0; c < Nb; c++) {\n" +
-            "      const a = new Array(Nb);\n" +
-            "      const b = new Array(Nb);\n" +
-            "      for (let r = 0; r < 4; r++) {\n" +
-            "        a[r] = s[r][c];\n" +
-            "        b[r] = s[r][c] & 0x80 ? s[r][c] << 1 ^ 0x011b : s[r][c] << 1;\n" +
-            "      }\n" +
-            "\n" +
-            "      s[0][c] = b[0] ^ a[1] ^ b[1] ^ a[2] ^ a[3];\n" +
-            "      s[1][c] = a[0] ^ b[1] ^ a[2] ^ b[2] ^ a[3];\n" +
-            "      s[2][c] = a[0] ^ a[1] ^ b[2] ^ a[3] ^ b[3];\n" +
-            "      s[3][c] = a[0] ^ b[0] ^ a[1] ^ a[2] ^ b[3];\n" +
-            "    }\n" +
-            "    return s;\n" +
-            "  }\n" +
-            "\n" +
-            "  function addRoundKey(state, w, rnd, Nb) {\n" +
-            "    for (let r = 0; r < 4; r++) {\n" +
-            "      for (let c = 0; c < Nb; c++) state[r][c] ^= w[rnd * 4 + c][r];\n" +
-            "    }\n" +
-            "    return state;\n" +
-            "  }\n" +
-            "\n" +
-            "  function subWord(w) {\n" +
-            "    for (let i = 0; i < 4; i++) w[i] = sBox[w[i]];\n" +
-            "    return w;\n" +
-            "  }\n" +
-            "\n" +
-            "  function rotWord(w) {\n" +
-            "    const tmp = w[0];\n" +
-            "    for (let i = 0; i < 3; i++) w[i] = w[i + 1];\n" +
-            "    w[3] = tmp;\n" +
-            "    return w;\n" +
-            "  }\n" +
-            "\n" +
-            "  function base64Decode(str) {\n" +
-            "    if (typeof atob != 'undefined') return atob(str);\n" +
-            "    if (typeof Buffer != 'undefined') return new Buffer(str, 'base64').toString('binary');\n" +
-            "    throw new Error('No Base64 Decode');\n" +
-            "  }\n" +
-            "\n" +
-            "  function utf8Encode(str) {\n" +
-            "    try {\n" +
-            "      return new TextEncoder().encode(str, 'utf-8').reduce((prev, curr) => prev + String.fromCharCode(curr), '');\n" +
-            "    } catch (e) {\n" +
-            "      return unescape(encodeURIComponent(str));\n" +
-            "    }\n" +
-            "  }\n" +
-            "\n" +
-            "  function utf8Decode(str) {\n" +
-            "    try {\n" +
-            "      return new TextEncoder().decode(str, 'utf-8').reduce((prev, curr) => prev + String.fromCharCode(curr), '');\n" +
-            "    } catch (e) {\n" +
-            "      return decodeURIComponent(escape(str));\n" +
-            "    }\n" +
-            "  }\n" +
-            "\n" +
-            "  function nistDecryption(ciphertext, key, counterBlock) {\n" +
-            "    const blockSize = 16;\n" +
-            "\n" +
-            "    // generate key schedule - an expansion of the key into distinct Key Rounds for each round\n" +
-            "    const keySchedule = keyExpansion(key);\n" +
-            "\n" +
-            "    const blockCount = Math.ceil(ciphertext.length / blockSize);\n" +
-            "    const plaintext = new Array(ciphertext.length);\n" +
-            "\n" +
-            "    for (let b = 0; b < blockCount; b++) {\n" +
-            "      // ---- decrypt counter block; Oⱼ = CIPHₖ(Tⱼ) ----\n" +
-            "      const cipherCntr = cipher(counterBlock, keySchedule);\n" +
-            "\n" +
-            "      // block size is reduced on final block\n" +
-            "      const blockLength = b < blockCount - 1 ? blockSize : (ciphertext.length - 1) % blockSize + 1;\n" +
-            "\n" +
-            "      // ---- xor ciphertext with ciphered counter byte-by-byte; Pⱼ = Cⱼ ⊕ Oⱼ ----\n" +
-            "      for (let i = 0; i < blockLength; i++) {\n" +
-            "        plaintext[b * blockSize + i] = cipherCntr[i] ^ ciphertext[b * blockSize + i];\n" +
-            "      }\n" +
-            "\n" +
-            "      // increment counter block (counter in 2nd 8 bytes of counter block, big-endian)\n" +
-            "      counterBlock[blockSize - 1]++;\n" +
-            "      // and propagate carry digits\n" +
-            "      for (let i = blockSize - 1; i >= 8; i--) {\n" +
-            "        counterBlock[i - 1] += counterBlock[i] >> 8;\n" +
-            "        counterBlock[i] &= 0xff;\n" +
-            "      }\n" +
-            "\n" +
-            "      // if within web worker, announce progress every 1000 blocks (roughly every 50ms)\n" +
-            "      if (typeof WorkerGlobalScope != 'undefined' && self instanceof WorkerGlobalScope) {\n" +
-            "        if (b % 1000 == 0) self.postMessage({ progress: b / blockCount });\n" +
-            "      }\n" +
-            "    }\n" +
-            "\n" +
-            "    return plaintext;\n" +
-            "  }\n" +
-            "\n" +
-            "  const sBox = [\n" +
-            "          0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,\n" +
-            "          0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,\n" +
-            "          0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,\n" +
-            "          0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a, 0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,\n" +
-            "          0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0, 0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,\n" +
-            "          0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b, 0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,\n" +
-            "          0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85, 0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,\n" +
-            "          0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5, 0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,\n" +
-            "          0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17, 0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,\n" +
-            "          0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88, 0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,\n" +
-            "          0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c, 0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,\n" +
-            "          0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9, 0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,\n" +
-            "          0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6, 0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,\n" +
-            "          0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,\n" +
-            "          0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,\n" +
-            "          0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16,\n" +
-            "      ];\n" +
-            "\n" +
-            "  const rCon = [\n" +
-            "        [0x00, 0x00, 0x00, 0x00],\n" +
-            "        [0x01, 0x00, 0x00, 0x00],\n" +
-            "        [0x02, 0x00, 0x00, 0x00],\n" +
-            "        [0x04, 0x00, 0x00, 0x00],\n" +
-            "        [0x08, 0x00, 0x00, 0x00],\n" +
-            "        [0x10, 0x00, 0x00, 0x00],\n" +
-            "        [0x20, 0x00, 0x00, 0x00],\n" +
-            "        [0x40, 0x00, 0x00, 0x00],\n" +
-            "        [0x80, 0x00, 0x00, 0x00],\n" +
-            "        [0x1b, 0x00, 0x00, 0x00],\n" +
-            "        [0x36, 0x00, 0x00, 0x00],\n" +
-            "      ];\n" +
-            "\n" +
-            "  if (![128, 192, 256].includes(nBits)) throw new Error('Key size is not 128 / 192 / 256');\n" +
-            "  ciphertext = base64Decode(String(ciphertext));\n" +
-            "  password = utf8Encode(String(password));\n" +
-            "\n" +
-            "  // use AES to encrypt password (mirroring encrypt routine)\n" +
-            "  const nBytes = nBits / 8; // no bytes in key\n" +
-            "  const pwBytes = new Array(nBytes);\n" +
-            "  for (let i = 0; i < nBytes; i++) { // use 1st nBytes chars of password for key\n" +
-            "    pwBytes[i] = i < password.length ? password.charCodeAt(i) : 0;\n" +
-            "  }\n" +
-            "  let key = cipher(pwBytes, keyExpansion(pwBytes));\n" +
-            "  key = key.concat(key.slice(0, nBytes - 16)); // expand key to 16/24/32 bytes long\n" +
-            "\n" +
-            "  // recover nonce from 1st 8 bytes of ciphertext into 1st 8 bytes of counter block\n" +
-            "  const counterBlock = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];\n" +
-            "  for (let i = 0; i < 8; i++) counterBlock[i] = ciphertext.charCodeAt(i);\n" +
-            "\n" +
-            "  // convert ciphertext to byte array (skipping past initial 8 bytes)\n" +
-            "  const ciphertextBytes = new Array(ciphertext.length - 8);\n" +
-            "  for (let i = 8; i < ciphertext.length; i++) ciphertextBytes[i - 8] = ciphertext.charCodeAt(i);\n" +
-            "\n" +
-            "  // ------------ perform decryption ------------\n" +
-            "  const plaintextBytes = nistDecryption(ciphertextBytes, key, counterBlock);\n" +
-            "\n" +
-            "  // convert byte array to (utf-8) plaintext string\n" +
-            "  const plaintextUtf8 = plaintextBytes.map(i => String.fromCharCode(i)).join('');\n" +
-            "\n" +
-            "  // decode from UTF8 back to Unicode multi-byte chars\n" +
-            "  const plaintext = utf8Decode(plaintextUtf8);\n" +
-            "\n" +
-            "  return plaintext;\n" +
-            "}"
-
-    fun decryptWv(context: android.content.Context, url: String, key: String){
-        val wv = WebView(context)
-        wv.settings.javaScriptEnabled = true
-        wv.evaluateJavascript(decryptFull(url, key, "256")) {
-            Log.d("T", "")
-        }
-    }
-
-    fun decrypt(url: String, key: String): String? {
-        val params = arrayOf(url, key, 256)
-        val rhino = Context.enter()
-
-        rhino.optimizationLevel = -1
-        try {
-            val scope = rhino.initStandardObjects()
-            rhino.evaluateString(scope, "", "JavaScript", 1, null)
-            val obj = scope.get("decrypt", scope)
-
-            if (obj is Function) {
-
-                val jsResult = obj.call(rhino, scope, scope, params)
-                return Context.toString(jsResult)
+    @SuppressLint("SetJavaScriptEnabled")
+    fun decryptWv(context: Context, url: String, key: String) {
+         WebView(context)
+            .apply {
+                settings.javaScriptEnabled = true
+                webChromeClient = object : WebChromeClient() {
+                    override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+                        Log.d(
+                            "MyApplication", consoleMessage.message() + " -- From line "
+                                    + consoleMessage.lineNumber() + " of "
+                                    + consoleMessage.sourceId()
+                        )
+                        return super.onConsoleMessage(consoleMessage)
+                    }
+                }
+            }.run {
+                loadDataWithBaseURL("", prepareData(encrypted = url, key = key), "text/html; charset=utf-8", "UTF-8", "")
             }
-        } catch (e: Exception) {
-            Log.d("test", "")
-        } finally {
-            Context.exit()
-        }
-
-        return null
     }
 }
