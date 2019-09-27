@@ -3,14 +3,20 @@ package org.adhash.sdk.adhashask.utils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import com.google.gson.Gson
+import java.net.URL
+import java.net.URLEncoder
 import java.security.MessageDigest
 
 private const val AES_KEY = "DECRYPTED:"
+
+private val TAG = DataEncryptor::class.java.simpleName
 
 class DataEncryptor(private val gson: Gson) {
 
@@ -69,6 +75,19 @@ class DataEncryptor(private val gson: Gson) {
             }.run {
                 loadDataWithBaseURL("", prepareData(encrypted = url, key = key), "text/html; charset=utf-8", "UTF-8", "")
             }
+    }
+
+    fun encryptUtf8(uri: Uri?): String? {
+        return try {
+            uri?.let {
+                val url = URL(uri.toString())
+                val query = URLEncoder.encode(url.query, "utf-8")
+                Uri.parse("${url.protocol}://${url.host}${url.path}?$query").toString()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to encode url")
+            uri.toString()
+        }
     }
 
     private fun base64ToBitmap(base64String: String) = Base64.decode(base64String, Base64.DEFAULT)

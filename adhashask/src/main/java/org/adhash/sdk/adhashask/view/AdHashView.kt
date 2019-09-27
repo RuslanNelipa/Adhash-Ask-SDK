@@ -31,7 +31,7 @@ import org.adhash.sdk.adhashask.utils.SystemInfo
 
 private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 
-private const val SCREENSHOT_HANDLER_DELAY = 3000L
+private const val SCREENSHOT_HANDLER_DELAY = 2000L
 
 class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, attrs) {
 
@@ -140,6 +140,13 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         vm.setUserProperties(analyticsUrl = analyticsUrl)
     }
 
+    fun setAnalyticsCallbacks(
+        onAnalyticsSuccess: (body: String) -> Unit,
+        onAnalyticsError: (error: Throwable) -> Unit
+    ) {
+        vm.setAnalyticsCallbacks(onAnalyticsSuccess, onAnalyticsError)
+    }
+
     private fun consumeAttrs(attrs: AttributeSet?) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.AdHashView)
 
@@ -170,8 +177,10 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     private fun addTouchDetector() {
         setOnTouchListener { _, motionEvent ->
-            if (motionEvent.action == MotionEvent.ACTION_DOWN)
+            if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                vm.attachCoordinatesToUri(motionEvent.x, motionEvent.y)
                 openUri()
+            }
             true
         }
     }

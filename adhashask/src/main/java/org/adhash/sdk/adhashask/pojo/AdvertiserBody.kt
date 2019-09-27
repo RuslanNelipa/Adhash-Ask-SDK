@@ -19,5 +19,6 @@ data class AdvertiserBody(
     var size: ScreenSize? = null,
     var currentTimestamp: Long? = null,
     var location: String? = null,
-    var connection: String? = null
+    var connection: String? = null,
+    var url: String? = null
 )

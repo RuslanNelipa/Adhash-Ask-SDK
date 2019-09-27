@@ -13,7 +13,11 @@ import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
 import java.lang.Exception
+import java.net.URLEncoder
 import kotlin.collections.ArrayList
+import android.net.Proxy.getHost
+import java.net.URI
+import java.net.URL
 
 
 private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
@@ -64,7 +68,7 @@ class AdHashVm(
     fun setAnalyticsCallbacks(
         onAnalyticsSuccess: (body: String) -> Unit,
         onAnalyticsError: (error: Throwable) -> Unit
-    ){
+    ) {
         this.onAnalyticsSuccess = onAnalyticsSuccess
         this.onAnalyticsError = onAnalyticsError
     }
@@ -109,6 +113,13 @@ class AdHashVm(
 
     fun isTalkbackEnabled() = systemInfo.isTalkBackEnabled()
 
+    fun attachCoordinatesToUri(x: Number, y: Number) {
+        uri = uri?.buildUpon()
+            ?.appendQueryParameter("offsetX", x.toString())
+            ?.appendQueryParameter("offsetY", y.toString())
+            ?.build()
+    }
+
     private fun addBuilderState(state: InfoBuildState) {
         builderStatesList.add(state)
         notifyInfoBuildUpdated()
@@ -141,6 +152,7 @@ class AdHashVm(
                 )
                 isp = getCarrierId()
                 recentAdvertisers = adsStorage.getAllRecentAds()
+                url = dataEncryptor.encryptUtf8(uri)
             }
         }
         Log.d(TAG, "Initial bidder creation complete")
@@ -206,7 +218,8 @@ class AdHashVm(
                 currentTimestamp = adBidderBody.currentTimestamp,
                 recentAdvertisers = adBidderBody.recentAdvertisers,
                 period = adBidderResponse.period,
-                nonce = adBidderResponse.nonce
+                nonce = adBidderResponse.nonce,
+                url = dataEncryptor.encryptUtf8(uri)
             )
             Log.d(TAG, "Advertiser Body: ${body.let(dataEncryptor::json)}")
 
@@ -297,7 +310,7 @@ class AdHashVm(
 
         dataEncryptor.aes256(context, url, key,
             onReceived = {
-                parseUrl(it)
+                parseUrl(it, adId, adBidderResponse)
                 callAnalyticsModule(adId, adBidderResponse)
             }
         )
@@ -306,11 +319,46 @@ class AdHashVm(
         Log.d(TAG, "Encrypted KEY: $key")
     }
 
-    private fun parseUrl(url: String) {
+    /*STEP 8*/
+    private fun parseUrl(url: String, adId: String, adBidderResponse: AdBidderResponse) {
         Log.d(TAG, "Decrypted URL: $url")
 
-        uri = Uri.parse(url)
+        try {
+            uri = Uri.parse(url)
+                .buildUpon()
+                .appendQueryParameter("adTagId ", adTagId)
+                .appendQueryParameter("publishedId ", adBidderBody.publisherId)
+                .appendQueryParameter("creativeHash ", adId)
+                .appendQueryParameter("advertiserId ", adBidderResponse.creatives?.firstOrNull()?.advertiserId)
+                .appendQueryParameter("location ", adBidderBody.location)
+                .appendQueryParameter("platform ", adBidderBody.navigator?.platform)
+                .appendQueryParameter("connection ", adBidderBody.connection)
+                .appendQueryParameter("isp ", adBidderBody.isp)
+                .appendQueryParameter("orientation ", adBidderBody.orientation)
+                .appendQueryParameter("gps ", adBidderBody.gps)
+                .appendQueryParameter("language ", adBidderBody.navigator?.language)
+                .appendQueryParameter("device ", adBidderBody.navigator?.model?.substringBefore(" "))
+                .appendQueryParameter("model ", adBidderBody.navigator?.model?.substringAfter(" "))
+                .appendQueryParameter("type ", adBidderBody.navigator?.type)
+                .appendQueryParameter("screenWidth ", adBidderBody.size?.screenWidth.toString())
+                .appendQueryParameter("screenHeight ", adBidderBody.size?.screenHeight.toString())
+                .appendQueryParameter("timeZone ", adBidderBody.timezone.toString())
+                .appendQueryParameter("width ", adBidderBody.creatives?.firstOrNull()?.size?.substringBefore("x"))
+                .appendQueryParameter("height ", adBidderBody.creatives?.firstOrNull()?.size?.substringAfter("x"))
+                .appendQueryParameter("period ", adBidderResponse.period.toString())
+                .appendQueryParameter("cost ", adBidderResponse.creatives?.firstOrNull()?.maxPrice.toString())
+                .appendQueryParameter("commission ", adBidderResponse.creatives?.firstOrNull()?.commission.toString())
+                .appendQueryParameter("nonce ", adBidderResponse.nonce.toString())
+                .appendQueryParameter("mobile ", true.toString())
+                .appendQueryParameter("budgetId ", adBidderResponse.creatives?.firstOrNull()?.budgetId.toString())
+                .appendQueryParameter("timestamp ", systemInfo.getTimeInUnix().toString())
+                .appendQueryParameter("version ", version.toString())
+                .appendQueryParameter("url ", version.toString())
+                .build()
 
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to build click URL")
+        }
     }
 
     /*STEP 7*/
@@ -346,7 +394,7 @@ class AdHashVm(
 
             try {
                 apiClient.callAnalyticsModule(url, analyticsQuery, onAnalyticsSuccess, onAnalyticsError)
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 onAnalyticsError?.invoke(e)
             }
 
