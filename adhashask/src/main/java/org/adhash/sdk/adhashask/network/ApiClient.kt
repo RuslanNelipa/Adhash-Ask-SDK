@@ -11,6 +11,7 @@ import org.adhash.sdk.adhashask.pojo.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Exception
 
 private val TAG = Global.SDK_TAG + ApiClient::class.java.simpleName
 
@@ -50,7 +51,7 @@ class ApiClient(
 
     fun callAdvertiserUrl(advertiserUrl: String, body: AdvertiserBody, onSuccess: (AdvertiserResponse) -> Unit, onError: (ApiError) -> Unit) {
         advertiserUrl.extractBaseUrl().createRetrofit<AdvertiserApi>(gson)
-            .callAdvertiserUrl(advertiserUrl,body).enqueue(object : Callback<AdvertiserResponse> {
+            .callAdvertiserUrl(advertiserUrl, body).enqueue(object : Callback<AdvertiserResponse> {
                 override fun onFailure(call: Call<AdvertiserResponse>, error: Throwable) {
                     val apiError = errorHandler.consumeThrowable(error, getRequestPath(call))
                     Log.e(TAG, "API call exception:  $error")
@@ -75,33 +76,31 @@ class ApiClient(
             })
     }
 
-    fun callAnalyticsModule(url: String, analyticsBody: AnalyticsBody, onSuccess: (BaseResponse) -> Unit, onError: (ApiError) -> Unit){
-        url.extractBaseUrl().createRetrofit<AdvertiserApi>(gson)
-            .callAnalytics(url).enqueue(
-                object : Callback<BaseResponse> {
-                    override fun onFailure(call: Call<BaseResponse>, error: Throwable) {
-                        val apiError = errorHandler.consumeThrowable(error, getRequestPath(call))
+    @Throws (Exception::class)
+    fun callAnalyticsModule(baseUrl: String, analyticsQuery: AnalyticsBody,
+                            onSuccess: ((String) -> Unit)? = null,
+                            onError: ((Throwable) -> Unit)? = null
+    ) {
+        baseUrl.extractBaseUrl().createRetrofit<AnalyticsApi>(gson)
+            .callAnalytics(baseUrl, analyticsQuery.toQueryMap()).enqueue(
+                object : Callback<String> {
+                    override fun onFailure(call: Call<String>, error: Throwable) {
                         Log.e(TAG, "API call exception:  $error")
-                        onError(apiError)
+                        onError?.invoke(error)
                     }
 
-                    override fun onResponse(call: Call<BaseResponse>, response: Response<BaseResponse>) {
-                        response.body()?.let { advertiserResponse ->
+                    override fun onResponse(call: Call<String>, response: Response<String>) {
+                        response.body()?.let { body ->
                             Log.d(TAG, "Analytics module succeed.")
-                            if (advertiserResponse.status != ApiConstants.STATUS_OK) {
-                                onError(ApiError(ApiErrorCase.BadRequest, requestPath = getRequestPath(call)))
-                            } else {
-                                onSuccess(advertiserResponse)
-                            }
+                            onSuccess?.invoke(body)
 
                         } ?: run {
-                            val httpError = errorHandler.consumeError(response, getRequestPath(call))
-                            Log.e(TAG, "Failed to make API call:  $httpError")
-                            onError(httpError)
+                            onError?.invoke(Throwable("Empty analytics response"))
                         }
                     }
                 }
             )
     }
+
     private fun getRequestPath(call: Call<out BaseResponse>) = call.request().url().encodedPath()
 }

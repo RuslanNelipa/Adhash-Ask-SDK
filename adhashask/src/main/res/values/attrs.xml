@@ -8,5 +8,6 @@
         <attr name="version" format="string" />
         <attr name="adTagId" format="string" />
         <attr name="adOrder" format="integer" />
+        <attr name="analyticsUrl" format="string" />
     </declare-styleable>
 </resources>

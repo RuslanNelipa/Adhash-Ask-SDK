@@ -55,6 +55,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     private var version: String? = null
     private var adTagId: String? = null
     private var adOrder: Int? = null
+    private var analyticsUrl: String? = null
 
     private var screenshotUrlOpened = false
     private val screenshotHandler = Handler()
@@ -107,6 +108,38 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     }
     /*END VIEW LIFECYCLE*/
 
+    fun setAdPlaceholderDrawable(drawable: Drawable) {
+        placeholderDrawable = drawable
+    }
+
+    fun setAdErrorDrawable(drawable: Drawable) {
+        errorDrawable = drawable
+    }
+
+    fun setScreenShotTakenUrl(url: String) {
+        screenshotUrl = url
+    }
+
+    fun setVersionName(versionName: String) {
+        version = versionName
+        vm.setUserProperties(version = version)
+    }
+
+    fun setAdOrderOnScreen(adOrder: Int) {
+        this.adOrder = adOrder
+        vm.setUserProperties(adOrder = adOrder)
+    }
+
+    fun setAdTagId(adTagId: String) {
+        this.adTagId = adTagId
+        vm.setUserProperties(adTagId = adTagId)
+    }
+
+    fun setAdAnalyticsUrl(analyticsUrl: String) {
+        this.analyticsUrl = analyticsUrl
+        vm.setUserProperties(analyticsUrl = analyticsUrl)
+    }
+
     private fun consumeAttrs(attrs: AttributeSet?) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.AdHashView)
 
@@ -118,6 +151,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
             version = attributes.getString(R.styleable.AdHashView_version)
             adTagId = attributes.getString(R.styleable.AdHashView_adTagId)
             adOrder = attributes.getInteger(R.styleable.AdHashView_adOrder, 0)
+            analyticsUrl = attributes.getString(R.styleable.AdHashView_analyticsUrl)
             Log.d(TAG, "Attributes extracted")
 
         } catch (e: Exception) {
@@ -128,7 +162,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
             vm.setUserProperties(
                 adTagId = adTagId,
                 version = version,
-                adOrder = adOrder
+                adOrder = adOrder,
+                analyticsUrl = analyticsUrl
             )
         }
     }

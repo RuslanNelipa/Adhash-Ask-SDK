@@ -26,4 +26,36 @@ data class AnalyticsBody(
     var nonce: Number? = null,
     var pageview: Boolean? = null,
     var mobile: Boolean? = null
-)
+) {
+    fun toQueryMap(): Map<String, String?> {
+        return mapOf(
+            "adTagId" to "$adTagId",
+            "publishedId" to "$publishedId",
+            "adTagId" to "$adTagId",
+            "publishedId" to "$publishedId",
+            "creativeHash" to "$creativeHash",
+            "advertiserId" to "$advertiserId",
+            "pageURL" to "$pageURL",
+            "platform" to "$platform",
+            "connection" to "$connection",
+            "isp" to "$isp",
+            "orientation" to "$orientation",
+            "gps" to "$gps",
+            "language" to "$language",
+            "device" to "$device",
+            "model" to "$model",
+            "type" to "$type",
+            "screenWidth" to "$screenWidth",
+            "screenHeight" to "$screenHeight",
+            "timeZone" to "$timeZone",
+            "width" to "$width",
+            "height" to "$height",
+            "period" to "$period",
+            "cost" to "$cost",
+            "comission" to "$comission",
+            "nonce" to "$nonce",
+            "pageview" to "$pageview",
+            "mobile" to "$mobile"
+        )
+    }
+}

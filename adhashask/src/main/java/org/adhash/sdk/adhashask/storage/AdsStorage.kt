@@ -18,4 +18,6 @@ class AdsStorage(context: Context, private val gson: Gson) {
         .filterIsInstance<String>()
         .map { gson.fromJson<RecentAd>(it, RecentAd::class.java) }
         .toList()
+
+    fun clear() = prefs.edit().clear().apply()
 }

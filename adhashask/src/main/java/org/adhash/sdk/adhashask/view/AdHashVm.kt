@@ -12,6 +12,7 @@ import org.adhash.sdk.adhashask.pojo.*
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
+import java.lang.Exception
 import kotlin.collections.ArrayList
 
 
@@ -31,11 +32,14 @@ class AdHashVm(
 
     private lateinit var onBitmapReceived: (bmp: Bitmap, recentAd: RecentAd) -> Unit
     private lateinit var onError: (reason: String) -> Unit
+    private var onAnalyticsSuccess: ((body: String) -> Unit)? = null
+    private var onAnalyticsError: ((body: Throwable) -> Unit)? = null
 
     private var uri: Uri? = null
     private var adTagId: String? = null
     private var version: String? = null
     private var adOrder: Int? = null
+    private var analyticsUrl: String? = null
 
     enum class InfoBuildState {
         PublisherId, Gps, Creatives
@@ -45,10 +49,24 @@ class AdHashVm(
         buildInitialAdBidder(systemInfo)
     }
 
-    fun setUserProperties(adTagId: String?, version: String?, adOrder: Int?) {
-        this.adTagId = adTagId
-        this.version = version
-        this.adOrder = adOrder
+    fun setUserProperties(
+        adTagId: String? = null,
+        version: String? = null,
+        adOrder: Int? = null,
+        analyticsUrl: String? = null
+    ) {
+        adTagId?.let { this.adTagId = adTagId }
+        version?.let { this.version = version }
+        adOrder?.let { this.adOrder = adOrder }
+        analyticsUrl?.let { this.analyticsUrl = analyticsUrl }
+    }
+
+    fun setAnalyticsCallbacks(
+        onAnalyticsSuccess: (body: String) -> Unit,
+        onAnalyticsError: (error: Throwable) -> Unit
+    ){
+        this.onAnalyticsSuccess = onAnalyticsSuccess
+        this.onAnalyticsError = onAnalyticsError
     }
 
     fun setBidderProperty(
@@ -80,6 +98,7 @@ class AdHashVm(
 
     fun onDetachedFromWindow() {
         Log.d(TAG, "View detached")
+        adsStorage.clear()
     }
 
     fun onAdDisplayed(recentAd: RecentAd) {
@@ -279,7 +298,7 @@ class AdHashVm(
         dataEncryptor.aes256(context, url, key,
             onReceived = {
                 parseUrl(it)
-                callAnalyticsModule(it, adId, adBidderResponse)
+                callAnalyticsModule(adId, adBidderResponse)
             }
         )
 
@@ -294,46 +313,44 @@ class AdHashVm(
 
     }
 
-    private fun callAnalyticsModule(url: String, adId: String, adBidderResponse: AdBidderResponse) {
-        val analyticsBody = AnalyticsBody(
-            adTagId = adTagId,
-            publishedId = adBidderBody.publisherId,
-            creativeHash = adId,
-            advertiserId = adBidderResponse.creatives?.firstOrNull()?.advertiserId,
-            pageURL = adBidderBody.location,
-            platform = adBidderBody.navigator?.platform,
-            connection = adBidderBody.connection,
-            isp = adBidderBody.isp,
-            orientation = adBidderBody.orientation,
-            gps = adBidderBody.gps,
-            language = adBidderBody.navigator?.language,
-            device = adBidderBody.navigator?.model?.substringBefore(" "),
-            model = adBidderBody.navigator?.model?.substringAfter(" "),
-            type = adBidderBody.navigator?.type,
-            screenWidth = adBidderBody.size?.screenWidth,
-            screenHeight = adBidderBody.size?.screenHeight,
-            timeZone = adBidderBody.timezone,
-            width = adBidderBody.creatives?.firstOrNull()?.size?.substringBefore("x"),
-            height = adBidderBody.creatives?.firstOrNull()?.size?.substringAfter("x"),
-            period = adBidderResponse.period,
-            cost = adBidderResponse.creatives?.firstOrNull()?.maxPrice, //todo verify
-            comission = adBidderResponse.creatives?.firstOrNull()?.commission,
-            nonce = adBidderResponse.nonce,
-            pageview = (adOrder == 1 || adOrder == 0),
-            mobile = true
-        )
+    /*STEP 7*/
+    private fun callAnalyticsModule(adId: String, adBidderResponse: AdBidderResponse) {
+        analyticsUrl?.let { url ->
+            val analyticsQuery = AnalyticsBody(
+                adTagId = adTagId,
+                publishedId = adBidderBody.publisherId,
+                creativeHash = adId,
+                advertiserId = adBidderResponse.creatives?.firstOrNull()?.advertiserId,
+                pageURL = adBidderBody.location,
+                platform = adBidderBody.navigator?.platform,
+                connection = adBidderBody.connection,
+                isp = adBidderBody.isp,
+                orientation = adBidderBody.orientation,
+                gps = adBidderBody.gps,
+                language = adBidderBody.navigator?.language,
+                device = adBidderBody.navigator?.model?.substringBefore(" "),
+                model = adBidderBody.navigator?.model?.substringAfter(" "),
+                type = adBidderBody.navigator?.type,
+                screenWidth = adBidderBody.size?.screenWidth,
+                screenHeight = adBidderBody.size?.screenHeight,
+                timeZone = adBidderBody.timezone,
+                width = adBidderBody.creatives?.firstOrNull()?.size?.substringBefore("x"),
+                height = adBidderBody.creatives?.firstOrNull()?.size?.substringAfter("x"),
+                period = adBidderResponse.period,
+                cost = adBidderResponse.creatives?.firstOrNull()?.maxPrice,
+                comission = adBidderResponse.creatives?.firstOrNull()?.commission,
+                nonce = adBidderResponse.nonce,
+                pageview = (adOrder == 1 || adOrder == 0),
+                mobile = true
+            )
 
-        apiClient.callAnalyticsModule(url, analyticsBody,
-            onSuccess = {
-
-            },
-            onError = {
-
+            try {
+                apiClient.callAnalyticsModule(url, analyticsQuery, onAnalyticsSuccess, onAnalyticsError)
+            } catch (e: Exception){
+                onAnalyticsError?.invoke(e)
             }
-        )
 
-        uri = Uri.parse(url)
-
+        } ?: onAnalyticsError?.invoke(Throwable("Analytics URL is empty"))
     }
 
     private fun String.isAdExpected(expectedHashes: ArrayList<String>): Boolean = this.let(expectedHashes::contains)
