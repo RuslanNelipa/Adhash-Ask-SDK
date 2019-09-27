@@ -13,11 +13,7 @@ import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
 import java.lang.Exception
-import java.net.URLEncoder
 import kotlin.collections.ArrayList
-import android.net.Proxy.getHost
-import java.net.URI
-import java.net.URL
 
 
 private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
@@ -120,15 +116,15 @@ class AdHashVm(
             ?.build()
     }
 
-    private fun addBuilderState(state: InfoBuildState) {
-        builderStatesList.add(state)
-        notifyInfoBuildUpdated()
-    }
-
-    private fun notifyInfoBuildUpdated() {
+    fun fetchBidderAttempt() {
         if (builderStatesList.containsAll(completeBuilderState)) {
             fetchBidder()
         }
+    }
+
+    private fun addBuilderState(state: InfoBuildState) {
+        builderStatesList.add(state)
+        fetchBidderAttempt()
     }
 
     private fun buildInitialAdBidder(systemInfo: SystemInfo) {

@@ -73,18 +73,18 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         vm.setBidderProperty(
             creatives = arrayListOf(
+                AdSizes(
+                    size = "${MeasureSpec.getSize(widthMeasureSpec)}" +
+                            "x" +
+                            "${MeasureSpec.getSize(heightMeasureSpec)}"
+                )
 //                AdSizes(
-//                    size = "${MeasureSpec.getSize(widthMeasureSpec)}" +
-//                            "x" +
-//                            "${MeasureSpec.getSize(heightMeasureSpec)}"
-//                ),
-//                AdSizes(//todo remove. It's for tests
 //                    size = "728x90"
 //                )
 //            ,
-                AdSizes(//todo remove. It's for tests
-                    size = "300x250"
-                )
+//                AdSizes(
+//                    size = "300x250"
+//                )
             )
         )
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -147,6 +147,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         vm.setAnalyticsCallbacks(onAnalyticsSuccess, onAnalyticsError)
     }
 
+    fun requestNewAd() = vm.fetchBidderAttempt()
+
     private fun consumeAttrs(attrs: AttributeSet?) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.AdHashView)
 
@@ -201,7 +203,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         }
     }
 
-    private fun getErrorDrawable() = errorDrawable ?: ContextCompat.getDrawable(context, R.drawable.ic_cross_24)
+    private fun getErrorDrawable() = errorDrawable
 
     private fun disableAdForVisionImpaired() {
         if (vm.isTalkbackEnabled()) visibility = View.GONE
