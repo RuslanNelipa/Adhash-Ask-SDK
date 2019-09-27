@@ -19,7 +19,7 @@ ext {
     siteUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK'
     gitUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK.git'
 
-    libraryVersion = '0.1.0'
+    libraryVersion = '1.0.0'
 
     developerId = 'RuslanNelipa'
     developerName = 'Ruslan Nelipa'
@@ -52,6 +52,10 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    allprojects {
+        tasks.withType(Javadoc).all { enabled = false }
     }
 }
 
