@@ -1,2 +1,2 @@
-include ':app', ':adhashask'
+include ':app', ':adhashask', ':coil-0.7.0'
 rootProject.name='TestAdHash'
