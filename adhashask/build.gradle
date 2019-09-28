@@ -19,7 +19,7 @@ ext {
     siteUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK'
     gitUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK.git'
 
-    libraryVersion = '1.0.0'
+    libraryVersion = '1.0.1'
 
     developerId = 'RuslanNelipa'
     developerName = 'Ruslan Nelipa'
@@ -68,12 +68,6 @@ dependencies {
     implementation 'androidx.core:core-ktx:' + androidXVersion
 
     implementation("io.coil-kt:coil:0.7.0")
-    implementation 'com.google.code.gson:gson:2.8.5'
-
-    def retrofitVersion = "2.6.1"
-    implementation 'com.squareup.retrofit2:retrofit:' + retrofitVersion
-    implementation 'com.squareup.retrofit2:converter-gson:' + retrofitVersion
-    implementation 'com.squareup.retrofit2:converter-scalars:' + retrofitVersion
 }
 
 if (project.rootProject.file('local.properties').exists()) {

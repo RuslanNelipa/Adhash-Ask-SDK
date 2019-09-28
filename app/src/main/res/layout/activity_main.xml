@@ -8,8 +8,8 @@
 
     <org.adhash.sdk.adhashask.view.AdHashView
         android:id="@+id/adView"
-        android:layout_width="250dp"
-        android:layout_height="150dp"
+        android:layout_width="300px"
+        android:layout_height="250px"
         app:publisherId="0x36016ae83df47035679f2e5d2c490c804a45ca9b"
         app:analyticsUrl="http://google.com"
         app:layout_constraintBottom_toBottomOf="parent"
