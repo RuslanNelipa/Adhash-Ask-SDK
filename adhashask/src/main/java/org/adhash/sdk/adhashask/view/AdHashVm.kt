@@ -176,6 +176,7 @@ class AdHashVm(
                 isp = getCarrierId()
                 recentAdvertisers = adsStorage.getAllRecentAds()
                 url = dataEncryptor.encryptUtf8(uri)
+                blockedAdvertisers = adsStorage.getAllBlockedAds()
             }
         }
         Log.d(TAG, "Initial bidder creation complete")
@@ -425,4 +426,14 @@ class AdHashVm(
     }
 
     private fun String.isAdExpected(expectedHashes: ArrayList<String>): Boolean = this.let(expectedHashes::contains)
+
+    fun addToBlockedList() {
+        adsStorage
+            .getAllRecentAds()
+            .lastOrNull()
+            ?.let {
+                adsStorage.saveBlockedAd(it)
+                adBidderBody.blockedAdvertisers?.add(it.advertiserId)
+            }
+    }
 }

@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Handler
@@ -17,6 +18,8 @@ import coil.api.load
 import com.google.gson.GsonBuilder
 import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.constants.Global
+import org.adhash.sdk.adhashask.ext.toDp
+import org.adhash.sdk.adhashask.ext.toPx
 import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.AdSizes
@@ -24,6 +27,8 @@ import org.adhash.sdk.adhashask.pojo.RecentAd
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
+
+
 
 private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 
@@ -89,6 +94,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     private var onError: ((error: String) -> Unit)? = null
 
+    private lateinit var blockAdImage: ImageView
+
     private var screenshotUrlOpened = false
     private val screenshotHandler = Handler()
     private val screenshotRunnable by lazy {
@@ -117,6 +124,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        createBlockIcon()
         addTouchDetector()
         vm.onAttachedToWindow(
             onBitmapReceived = ::loadAdBitmap,
@@ -124,6 +132,16 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         )
         disableAdForVisionImpaired()
         detectScreenShotService()
+    }
+
+    override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
+
+        canvas?.let {
+            val drawable = blockAdImage.drawable
+            drawable.setBounds(100, 100, drawable.intrinsicWidth + 100, drawable.intrinsicHeight + 100)
+            drawable.draw(canvas)
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -205,6 +223,20 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         }
     }
 
+    private fun createBlockIcon() {
+        blockAdImage = ImageView(context).apply {
+            setImageResource(R.drawable.ic_adhash)
+            setOnClickListener {
+                blockedAdUrl?.let {
+                    openUrl(blockedAdUrl)
+                    vm.addToBlockedList()
+                }
+            }
+//            layoutParams.height = 18.toPx(context).toInt()
+//            layoutParams.width = 18.toPx(context).toInt()
+        }
+    }
+
     private fun addTouchDetector() {
         setOnTouchListener { _, motionEvent ->
             if (motionEvent.action == MotionEvent.ACTION_DOWN) {
@@ -242,7 +274,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
             .also { intent -> context.startActivity(intent) }
     } ?: handleError("URL not found")
 
-    private fun openScreenshotUrl() = screenshotUrl?.let {
+    private fun openUrl(url: String?) = url?.let {
         Intent(Intent.ACTION_VIEW)
             .apply { data = Uri.parse(it) }
             .also { intent -> context.startActivity(intent) }
@@ -267,7 +299,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
                 .filter { it.process == "com.android.systemui:screenshot" }
                 .takeIf { !screenshotUrlOpened }
                 ?.forEach { _ ->
-                    openScreenshotUrl()
+                    openUrl(screenshotUrl)
                     screenshotUrlOpened = true
                 }
                 ?.also { screenshotHandler.postDelayed(this, delay) }
