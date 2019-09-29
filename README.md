@@ -42,7 +42,7 @@ dependencies{
         app:errorDrawable="@drawable/ic_cross_24"
         app:version="1.0"
         app:analyticsUrl="http://website.com"
-		app:screenshotUrl="http://website.com"/>
+	app:screenshotUrl="http://website.com"/>
 ```
 
 | Property  | Explanation  |
