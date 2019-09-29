@@ -26,7 +26,7 @@ dependencies{
 ```
 
 ### How to use
-1) Add to layout. `PublishedId` is required to make library work properly.
+1) Add to layout. `publisherId` is required to make library work properly.
 ```xml
 <org.adhash.sdk.adhashask.view.AdHashView
         ....
