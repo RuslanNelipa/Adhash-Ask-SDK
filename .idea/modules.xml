@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Adhash-Ask-SDK.iml" filepath="$PROJECT_DIR$/.idea/Adhash-Ask-SDK.iml" />
+      <module fileurl="file://$PROJECT_DIR$/adhashask/Adhash-Ask-SDK-adhashask.iml" filepath="$PROJECT_DIR$/adhashask/Adhash-Ask-SDK-adhashask.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/Adhash-Ask-SDK-app.iml" filepath="$PROJECT_DIR$/app/Adhash-Ask-SDK-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/TestAdHash.iml" filepath="$PROJECT_DIR$/TestAdHash.iml" />
       <module fileurl="file://$PROJECT_DIR$/adhashask/adhashask.iml" filepath="$PROJECT_DIR$/adhashask/adhashask.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
