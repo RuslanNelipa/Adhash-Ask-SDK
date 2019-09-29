@@ -29,11 +29,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-//    implementation project(":adhashask")
     implementation 'org.adhash.sdk:adhashsdk:1.0.5'
 
     implementation("io.coil-kt:coil:0.7.0")
-
     implementation 'com.google.code.gson:gson:2.8.5'
 
     def retrofitVersion = "2.6.2"
