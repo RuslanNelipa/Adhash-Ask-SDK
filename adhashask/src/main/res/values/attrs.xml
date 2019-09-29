@@ -9,5 +9,20 @@
         <attr name="adTagId" format="string" />
         <attr name="adOrder" format="integer" />
         <attr name="analyticsUrl" format="string" />
+        <attr name="timezone" format="integer" />
+        <attr name="location" format="string" />
+        <attr name="screenWidth" format="integer" />
+        <attr name="screenHeight" format="integer" />
+        <attr name="platform" format="string" />
+        <attr name="language" format="string" />
+        <attr name="device" format="string" />
+        <attr name="model" format="string" />
+        <attr name="type" format="string" />
+        <attr name="connection" format="string" />
+        <attr name="isp" format="string" />
+        <attr name="orientation" format="string" />
+        <attr name="gps" format="string" />
+        <attr name="creativesSize" format="string" />
+        <attr name="blockAdUrl" format="string" />
     </declare-styleable>
 </resources>

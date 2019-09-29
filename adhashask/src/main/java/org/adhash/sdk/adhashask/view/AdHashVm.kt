@@ -12,8 +12,6 @@ import org.adhash.sdk.adhashask.pojo.*
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
-import java.lang.Exception
-import kotlin.collections.ArrayList
 
 
 private val TAG = Global.SDK_TAG + AdHashVm::class.java.simpleName
@@ -53,12 +51,40 @@ class AdHashVm(
         adTagId: String? = null,
         version: String? = null,
         adOrder: Int? = null,
-        analyticsUrl: String? = null
+        analyticsUrl: String? = null,
+        timezone: Int? = null,
+        location: String? = null,
+        screenWidth: Int? = null,
+        screenHeight: Int? = null,
+        platform: String? = null,
+        language: String? = null,
+        device: String? = null,
+        model: String? = null,
+        type: String? = null,
+        connection: String? = null,
+        isp: String? = null,
+        orientation: String? = null,
+        gps: String? = null,
+        creativesSize: String? = null
     ) {
-        adTagId?.let { this.adTagId = adTagId }
-        version?.let { this.version = version }
-        adOrder?.let { this.adOrder = adOrder }
-        analyticsUrl?.let { this.analyticsUrl = analyticsUrl }
+        adTagId?.let { this.adTagId = it }
+        version?.let { this.version = it }
+        adOrder?.let { this.adOrder = it }
+        analyticsUrl?.let { this.analyticsUrl = it }
+        timezone?.let { adBidderBody.timezone = it }
+        location?.let { adBidderBody.location = it }
+        safeLet(screenWidth, screenHeight) { width, height -> adBidderBody.size = ScreenSize(width, height) }
+        platform?.let { adBidderBody.navigator?.platform = it }
+        language?.let { adBidderBody.navigator?.language = it }
+        device?.let { adBidderBody.navigator?.userAgent = it }
+        model?.let { adBidderBody.navigator?.model = it }
+        type?.let { adBidderBody.navigator?.type = it }
+        connection?.let { adBidderBody.connection = it }
+        isp?.let { adBidderBody.isp = it }
+        orientation?.let { adBidderBody.orientation = it }
+        gps?.let { adBidderBody.gps = it }
+        creativesSize?.let { adBidderBody.creatives = arrayListOf(AdSizes(it)) }
+
     }
 
     fun setAnalyticsCallbacks(
@@ -69,7 +95,7 @@ class AdHashVm(
         this.onAnalyticsError = onAnalyticsError
     }
 
-    fun setBidderProperty(
+    fun buildBidderProperty(
         publisherId: String? = null,
         creatives: ArrayList<AdSizes>? = null
     ) {
@@ -119,12 +145,13 @@ class AdHashVm(
     fun fetchBidderAttempt() {
         if (builderStatesList.containsAll(completeBuilderState)) {
             fetchBidder()
+        } else {
+            onError("Not all info given")
         }
     }
 
     private fun addBuilderState(state: InfoBuildState) {
         builderStatesList.add(state)
-        fetchBidderAttempt()
     }
 
     private fun buildInitialAdBidder(systemInfo: SystemInfo) {
