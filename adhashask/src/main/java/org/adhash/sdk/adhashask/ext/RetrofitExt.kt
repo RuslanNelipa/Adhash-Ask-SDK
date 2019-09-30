@@ -1,7 +1,6 @@
 package org.adhash.sdk.adhashask.ext
 
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import org.adhash.sdk.adhashask.network.LoggingInterceptor

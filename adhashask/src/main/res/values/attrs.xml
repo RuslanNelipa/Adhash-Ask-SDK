@@ -2,7 +2,6 @@
 <resources>
     <declare-styleable name="AdHashView">
         <attr name="publisherId" format="string" />
-        <attr name="placeholderDrawable" format="reference" />
         <attr name="errorDrawable" format="reference" />
         <attr name="screenshotUrl" format="string" />
         <attr name="version" format="string" />

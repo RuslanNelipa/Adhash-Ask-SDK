@@ -102,5 +102,5 @@ class ApiClient(
             )
     }
 
-    private fun getRequestPath(call: Call<out BaseResponse>) = call.request().url().encodedPath()
+    private fun getRequestPath(call: Call<out BaseResponse>) = call.request().url.encodedPath
 }

@@ -22,8 +22,8 @@ class LoggingInterceptor : Interceptor {
     private fun printRequestAndResponse(chain: Interceptor.Chain): Response {
         Log.d(INNER_TAG, "*********************************************************")
         val request = chain.request()
-        val requestBody = request.body()
-        val reqUrl = request.url()
+        val requestBody = request.body
+        val reqUrl = request.url
 
         val buffer = Buffer()
         requestBody?.writeTo(buffer)
@@ -52,14 +52,14 @@ class LoggingInterceptor : Interceptor {
         }
 
         var responseString = "empty"
-        val responseBody = response.body()
+        val responseBody = response.body
         val contentLength = responseBody!!.contentLength()
-        val url = response.request().url()
-        val code = response.code()
+        val url = response.request.url
+        val code = response.code
 
 
         if (response.bodyEncoded()) {
-            responseString = "${request.method()}  (encoded body omitted)"
+            responseString = "${request.method}  (encoded body omitted)"
         } else {
             val source = responseBody.source()
             source.request(java.lang.Long.MAX_VALUE) // Buffer the entire body.
@@ -110,7 +110,7 @@ class LoggingInterceptor : Interceptor {
     }
 
     private fun Response.bodyEncoded(): Boolean {
-        val contentEncoding = this.headers().get("Content-Encoding")
+        val contentEncoding = this.headers.get("Content-Encoding")
         return contentEncoding != null && !contentEncoding.equals("identity", ignoreCase = true)
     }
 

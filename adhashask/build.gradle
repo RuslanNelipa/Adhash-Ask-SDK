@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.kezong.fat-aar'
 
 /*gradlew install -> build library and check if no errors*/
 /*gradlew bintrayUpload -> use this to upload new version to bintray*/
@@ -19,7 +20,7 @@ ext {
     siteUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK'
     gitUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK.git'
 
-    libraryVersion = '1.1.0'
+    libraryVersion = '1.0.21'
 
     developerId = 'RuslanNelipa'
     developerName = 'Ruslan Nelipa'
@@ -60,22 +61,23 @@ android {
 }
 
 dependencies {
-//    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    compileOnly 'androidx.core:core-ktx:1.1.0'
 
-    def androidXVersion = "1.0.2"
-    api 'androidx.appcompat:appcompat:' + androidXVersion
-    api 'androidx.core:core-ktx:' + androidXVersion
+    embed 'com.google.code.gson:gson:2.8.5'
 
-    api("io.coil-kt:coil:0.7.0")
-
-    api 'com.google.code.gson:gson:2.8.5'
+    def okhttpVersion = "4.2.0"
+    embed 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+    embed 'com.squareup.okhttp3:logging-interceptor:' + okhttpVersion
+    embed 'com.squareup.okio:okio:2.2.2'
 
     def retrofitVersion = "2.6.2"
-    api 'com.squareup.retrofit2:retrofit:' + retrofitVersion
-    api 'com.squareup.retrofit2:converter-gson:' + retrofitVersion
-    api 'com.squareup.retrofit2:converter-scalars:' + retrofitVersion
+    embed 'com.squareup.retrofit2:retrofit:' + retrofitVersion
+    embed 'com.squareup.retrofit2:converter-gson:' + retrofitVersion
+    embed 'com.squareup.retrofit2:converter-scalars:' + retrofitVersion
 }
+
+//configurations.embed.transitive = true
 
 if (project.rootProject.file('local.properties').exists()) {
     apply from: 'https://raw.githubusercontent.com/wajahatkarim3/JCenter-Gradle-Scripts/master/install.gradle'

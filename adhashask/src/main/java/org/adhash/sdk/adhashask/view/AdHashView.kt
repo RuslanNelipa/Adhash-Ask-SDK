@@ -14,12 +14,9 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
-import coil.api.load
 import com.google.gson.GsonBuilder
 import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.constants.Global
-import org.adhash.sdk.adhashask.ext.toDp
-import org.adhash.sdk.adhashask.ext.toPx
 import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.AdSizes
@@ -27,7 +24,6 @@ import org.adhash.sdk.adhashask.pojo.RecentAd
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
-
 
 
 private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
@@ -50,7 +46,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     )
 
     /*Attributes*/
-    var placeholderDrawable: Drawable? = null
     var errorDrawable: Drawable? = null
     var screenshotUrl: String? = null
     var blockedAdUrl: String? = null
@@ -171,7 +166,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
         try {
             vm.buildBidderProperty(publisherId = attributes.getString(R.styleable.AdHashView_publisherId))
-            placeholderDrawable = attributes.getDrawable(R.styleable.AdHashView_placeholderDrawable)
             errorDrawable = attributes.getDrawable(R.styleable.AdHashView_errorDrawable)
             screenshotUrl = attributes.getString(R.styleable.AdHashView_screenshotUrl)
             version = attributes.getString(R.styleable.AdHashView_version)
@@ -249,19 +243,13 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     private fun handleError(reason: String) {
         Log.e(TAG, "Ad load failed: $reason")
-        load(errorDrawable)
         onError?.invoke(reason)
+        setImageDrawable(errorDrawable)
     }
 
     private fun loadAdBitmap(bitmap: Bitmap, recentAd: RecentAd) {
-        load(bitmap) {
-            crossfade(true)
-            error(errorDrawable)
-            placeholder(placeholderDrawable)
-            listener(
-                onSuccess = { _, _ -> vm.onAdDisplayed(recentAd) }
-            )
-        }
+        setImageBitmap(bitmap)
+        vm.onAdDisplayed(recentAd)
     }
 
     private fun disableAdForVisionImpaired() {
