@@ -8,10 +8,11 @@
 
     <org.adhash.sdk.adhashask.view.AdHashView
         android:id="@+id/adView"
-        android:layout_width="300px"
-        android:layout_height="250px"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:publisherId="0x36016ae83df47035679f2e5d2c490c804a45ca9b"
         app:analyticsUrl="http://google.com"
+        app:creativesSize="300x250"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

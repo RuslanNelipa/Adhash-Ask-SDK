@@ -23,5 +23,7 @@
         <attr name="gps" format="string" />
         <attr name="creativesSize" format="string" />
         <attr name="blockAdUrl" format="string" />
+        <attr name="blockAdWidth" format="dimension" />
+        <attr name="blockAdHeight" format="dimension" />
     </declare-styleable>
 </resources>

@@ -20,7 +20,7 @@ ext {
     siteUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK'
     gitUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK.git'
 
-    libraryVersion = '1.0.21'
+    libraryVersion = '1.0.22'
 
     developerId = 'RuslanNelipa'
     developerName = 'Ruslan Nelipa'

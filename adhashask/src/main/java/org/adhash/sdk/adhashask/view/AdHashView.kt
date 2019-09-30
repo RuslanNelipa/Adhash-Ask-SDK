@@ -5,7 +5,6 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Handler
@@ -13,10 +12,12 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
 import com.google.gson.GsonBuilder
 import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.constants.Global
+import org.adhash.sdk.adhashask.ext.safeLet
 import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.AdSizes
@@ -30,7 +31,7 @@ private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 
 private const val SCREENSHOT_HANDLER_DELAY = 2000L
 
-class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, attrs) {
+class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
 
     private val gson = GsonBuilder()
         .disableHtmlEscaping()
@@ -49,7 +50,11 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     var errorDrawable: Drawable? = null
     var screenshotUrl: String? = null
     var blockedAdUrl: String? = null
+    var blockAdWidth: Float? = null
+    var blockAdHeight: Float? = null
 
+    var publisherId: String? = null
+        set(value) = vm.setUserProperties(publisherId = value)
     var version: String? = null
         set(value) = vm.setUserProperties(version = value)
     var adTagId: String? = null
@@ -89,7 +94,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     private var onError: ((error: String) -> Unit)? = null
 
-    private lateinit var blockAdImage: ImageView
+    private lateinit var ivBlock: ImageView
+    private lateinit var ivAdHash: ImageView
 
     private var screenshotUrlOpened = false
     private val screenshotHandler = Handler()
@@ -101,6 +107,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     init {
         consumeAttrs(attrs)
+        inflate()
     }
 
     @SuppressLint("DrawAllocation")
@@ -119,7 +126,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        createBlockIcon()
         addTouchDetector()
         vm.onAttachedToWindow(
             onBitmapReceived = ::loadAdBitmap,
@@ -127,16 +133,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         )
         disableAdForVisionImpaired()
         detectScreenShotService()
-    }
-
-    override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
-
-        canvas?.let {
-            val drawable = blockAdImage.drawable
-            drawable.setBounds(100, 100, drawable.intrinsicWidth + 100, drawable.intrinsicHeight + 100)
-            drawable.draw(canvas)
-        }
     }
 
     override fun onDetachedFromWindow() {
@@ -161,11 +157,32 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
 
     fun requestNewAd() = vm.fetchBidderAttempt()
 
+    private fun inflate() {
+        View.inflate(context, R.layout.adhash_view, this)
+
+        ivAdHash = findViewById(R.id.ivAdHash)
+        ivBlock = findViewById(R.id.ivBlock)
+
+        safeLet(blockAdHeight, blockAdWidth){ height, width ->
+            if (blockAdWidth?.compareTo(0) == 1 && blockAdHeight?.compareTo(0) == 1) {
+                ivBlock.layoutParams.height = height.toInt()
+                ivBlock.layoutParams.width = width.toInt()
+            }
+        }
+
+        ivBlock.setOnClickListener {
+            blockedAdUrl?.let {
+                openUrl(blockedAdUrl)
+                vm.addToBlockedList()
+            }
+        }
+    }
+
     private fun consumeAttrs(attrs: AttributeSet?) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.AdHashView)
 
         try {
-            vm.buildBidderProperty(publisherId = attributes.getString(R.styleable.AdHashView_publisherId))
+            publisherId = attributes.getString(R.styleable.AdHashView_publisherId)
             errorDrawable = attributes.getDrawable(R.styleable.AdHashView_errorDrawable)
             screenshotUrl = attributes.getString(R.styleable.AdHashView_screenshotUrl)
             version = attributes.getString(R.styleable.AdHashView_version)
@@ -187,12 +204,15 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
             orientation = attributes.getString(R.styleable.AdHashView_orientation)
             gps = attributes.getString(R.styleable.AdHashView_gps)
             creativesSize = attributes.getString(R.styleable.AdHashView_creativesSize)
+            blockAdWidth = attributes.getDimension(R.styleable.AdHashView_blockAdWidth, -1f)
+            blockAdHeight = attributes.getDimension(R.styleable.AdHashView_blockAdHeight, -1f)
             Log.d(TAG, "Attributes extracted")
 
         } catch (e: Exception) {
             Log.e(TAG, "Failed to read attributes")
         } finally {
             attributes.recycle()
+            vm.buildBidderProperty(publisherId = publisherId)
 
             vm.setUserProperties(
                 adTagId = adTagId,
@@ -217,20 +237,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
         }
     }
 
-    private fun createBlockIcon() {
-        blockAdImage = ImageView(context).apply {
-            setImageResource(R.drawable.ic_adhash)
-            setOnClickListener {
-                blockedAdUrl?.let {
-                    openUrl(blockedAdUrl)
-                    vm.addToBlockedList()
-                }
-            }
-//            layoutParams.height = 18.toPx(context).toInt()
-//            layoutParams.width = 18.toPx(context).toInt()
-        }
-    }
-
     private fun addTouchDetector() {
         setOnTouchListener { _, motionEvent ->
             if (motionEvent.action == MotionEvent.ACTION_DOWN) {
@@ -244,11 +250,11 @@ class AdHashView(context: Context, attrs: AttributeSet?) : ImageView(context, at
     private fun handleError(reason: String) {
         Log.e(TAG, "Ad load failed: $reason")
         onError?.invoke(reason)
-        setImageDrawable(errorDrawable)
+        ivBlock.setImageDrawable(errorDrawable)
     }
 
     private fun loadAdBitmap(bitmap: Bitmap, recentAd: RecentAd) {
-        setImageBitmap(bitmap)
+        ivBlock.setImageBitmap(bitmap)
         vm.onAdDisplayed(recentAd)
     }
 

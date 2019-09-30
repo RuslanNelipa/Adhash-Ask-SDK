@@ -48,6 +48,7 @@ class AdHashVm(
     }
 
     fun setUserProperties(
+        publisherId: String? = null,
         adTagId: String? = null,
         version: String? = null,
         adOrder: Int? = null,
@@ -82,9 +83,19 @@ class AdHashVm(
         connection?.let { adBidderBody.connection = it }
         isp?.let { adBidderBody.isp = it }
         orientation?.let { adBidderBody.orientation = it }
-        gps?.let { adBidderBody.gps = it }
-        creativesSize?.let { adBidderBody.creatives = arrayListOf(AdSizes(it)) }
+        gps?.let {
+            adBidderBody.gps = it
+            addBuilderState(InfoBuildState.Gps)
+        }
+        creativesSize?.let {
+            adBidderBody.creatives = arrayListOf(AdSizes(it))
+            addBuilderState(InfoBuildState.Creatives)
+        }
 
+        publisherId?.let {
+            adBidderBody.publisherId = it
+            addBuilderState(InfoBuildState.PublisherId)
+        }
     }
 
     fun setAnalyticsCallbacks(
