@@ -11,11 +11,10 @@
 ```
 
 2. Latest version [here](https://github.com/RuslanNelipa/Adhash-Ask-SDK/releases "Releases")
-3. SDK uses external libraries. Therefore you need to add them to app `build.gradle`. Version names might be different.
+3. SDK uses external libraries. Keep in mind that you don't need to add those to `build.gradle`. You will have to resolve conflicts otherways
 
 ```xml
 dependencies{
-    implementation("io.coil-kt:coil:0.7.0") //Image loaded library
     implementation 'com.google.code.gson:gson:2.8.5' //JSON deserealizer
 
     def retrofitVersion = "2.6.2"
@@ -33,28 +32,34 @@ dependencies{
         app:publisherId="0x36016ae83df471d11332e5d2c490c804a45ca9b" />
 ```
 2) Other available parameters:
-```xml
-<org.adhash.sdk.adhashask.view.AdHashView
-       ...
-        app:adOrder="1"
-        app:adTagId="name of ad slot on screen"
-        app:placeholderDrawable="@drawable/ic_launcher_foreground"
-        app:errorDrawable="@drawable/ic_cross_24"
-        app:version="1.0"
-        app:analyticsUrl="http://website.com"
-	app:screenshotUrl="http://website.com"/>
-```
 
-| Property  | Explanation  |
-| ------------ | ------------ |
-| placeholderDrawable  |  drawable resource. Will be used as a placeholder before Ad loaded  |
-| errorDrawable  |  drawable resource. Will be displayed if Ad failed to load  |
-| screenshotUrl | URL for redirection when user takes screenshot
-|version|version of library usage. Set by user
-|analyticsUrl| URL for which analytics will be sent
-|adTagId| explanation of Ad placement on screen. Free text form
+| Property  | Example | Explanation  |
+| ------------ | ------------ | ------------ |
+|publisherId | 0x36016ae83df47035679f2e5d2c490c804a67ca9b | Publisher ID |
+|errorDrawable | @drawable/ic_error | Image resource that will be placed if any error occured during ad loading  |
+|screenshotUrl | http://website.com | URL to chish user will redirected when screenshot taken. This works only if READ_EXTERNAL_STORAGE prmission is given |
+|version | 1 | Version of SKD usage. Set by user |
+|adTagId | middle of screen | Text form. Identifier for location of Ad on screen |
+|adOrder | 1 | Order of the Ad on screen |
+|analyticsUrl | http://website.com | URL which will be called as GET request with advertiser parameters |
+|timezone | -3 | Timezone, stands for GMT+3:00 |
+|location | com.package.net | unique application identifier |
+|screenWidth | 1366 | Screen width |
+|screenHeight | 768 | Screen height |
+|platform | ARM | Device platform, something like 'ARM','iPad','iPhone','Linux aarch64','Linux armv7l','Linux i686',... |
+|language | en-US | Locale settings |
+|device | Samsung | Device brand name |
+|model | Galaxy J7 Pro | Device model name |
+|type | mobile | "mobile" or "tablet" |
+|connection | WiFi | Connection type - WiFi, LTE, EDGE, HSDPA, etc. |
+|isp | CoolProvider | Internet service provider / carrier ID |
+|orientation | portrait | screen orientation |
+|gps | 30.3030303, 40.4040404 | coordinates. SDK tries to fetch it automatically of LOCATION permission is granted |
+|creativesSize | 300x250 | size in pixels of requested Ad |
+|adHashUrl | http://website.com | URL which will be opened when user clicks on AH icon |
 
 ### Public methods
 1. Setters for properties
 2. Callback for Analytics sent result
 3. Request new Ad
+4. Callbacks for errors
