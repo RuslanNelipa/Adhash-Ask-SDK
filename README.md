@@ -33,30 +33,30 @@ dependencies{
 ```
 2) Other available parameters:
 
-| Property  | Example | Explanation  |
-| ------------ | ------------ | ------------ |
-|publisherId | 0x36016ae83df47035679f2e5d2c490c804a67ca9b | Publisher ID |
-|errorDrawable | @drawable/ic_error | Image resource that will be placed if any error occured during ad loading  |
-|screenshotUrl | http://website.com | URL to chish user will redirected when screenshot taken. This works only if READ_EXTERNAL_STORAGE prmission is given |
-|version | 1 | Version of SKD usage. Set by user |
-|adTagId | middle of screen | Text form. Identifier for location of Ad on screen |
-|adOrder | 1 | Order of the Ad on screen |
-|analyticsUrl | http://website.com | URL which will be called as GET request with advertiser parameters |
-|timezone | -3 | Timezone, stands for GMT+3:00 |
-|location | com.package.net | unique application identifier |
-|screenWidth | 1366 | Screen width |
-|screenHeight | 768 | Screen height |
-|platform | ARM | Device platform, something like 'ARM','iPad','iPhone','Linux aarch64','Linux armv7l','Linux i686',... |
-|language | en-US | Locale settings |
-|device | Samsung | Device brand name |
-|model | Galaxy J7 Pro | Device model name |
-|type | mobile | "mobile" or "tablet" |
-|connection | WiFi | Connection type - WiFi, LTE, EDGE, HSDPA, etc. |
-|isp | CoolProvider | Internet service provider / carrier ID |
-|orientation | portrait | screen orientation |
-|gps | 30.3030303, 40.4040404 | coordinates. SDK tries to fetch it automatically of LOCATION permission is granted |
-|creativesSize | 300x250 | size in pixels of requested Ad |
-|adHashUrl | http://website.com | URL which will be opened when user clicks on AH icon |
+| Property | Mandatory | Example | Explanation  |
+| ------------ | ------------ | ------------ | ------------ |
+|publisherId | + | 0x36016ae83df47035679f2e5d2c490c804a67ca9b | Publisher ID |
+|errorDrawable | - | @drawable/ic_error | Image resource that will be placed if any error occured during ad loading  |
+|screenshotUrl | - |http://website.com | URL to chish user will redirected when screenshot taken. This works only if READ_EXTERNAL_STORAGE prmission is given |
+|version | - | 1 | Version of SKD usage. Set by user |
+|adTagId | - |middle of screen | Text form. Identifier for location of Ad on screen |
+|adOrder | - |1 | Order of the Ad on screen |
+|analyticsUrl | - |http://website.com | URL which will be called as GET request with advertiser parameters |
+|timezone | - |-3 | Timezone, stands for GMT+3:00 |
+|location | - |com.package.net | unique application identifier |
+|screenWidth | - |1366 | Screen width |
+|screenHeight | - |768 | Screen height |
+|platform | - |ARM | Device platform, something like 'ARM','iPad','iPhone','Linux aarch64','Linux armv7l','Linux i686',... |
+|language | - |en-US | Locale settings |
+|device | - |Samsung | Device brand name |
+|model | - |Galaxy J7 Pro | Device model name |
+|type | - |mobile | "mobile" or "tablet" |
+|connection | - |WiFi | Connection type - WiFi, LTE, EDGE, HSDPA, etc. |
+|isp | - |CoolProvider | Internet service provider / carrier ID |
+|orientation | - |portrait | screen orientation |
+|gps | - |30.3030303, 40.4040404 | coordinates. SDK tries to fetch it automatically of LOCATION permission is granted |
+|creativesSize | - |300x250 | size in pixels of requested Ad |
+|adHashUrl | - |http://website.com | URL which will be opened when user clicks on AH icon |
 
 ### Public methods
 1. Setters for properties
