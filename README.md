@@ -37,7 +37,7 @@ dependencies{
 | ------------ | ------------ | ------------ | ------------ |
 |publisherId | + | 0x36016ae83df47035679f2e5d2c490c804a67ca9b | Publisher ID |
 |errorDrawable | - | @drawable/ic_error | Image resource that will be placed if any error occured during ad loading  |
-|screenshotUrl | - |http://website.com | URL to chish user will redirected when screenshot taken. This works only if READ_EXTERNAL_STORAGE prmission is given |
+|screenshotUrl | - |http://website.com | URL to chish user will redirected when screenshot taken. This works only if READ_EXTERNAL_STORAGE permission is given |
 |version | - | 1 | Version of SKD usage. Set by user |
 |adTagId | - |middle of screen | Text form. Identifier for location of Ad on screen |
 |adOrder | - |1 | Order of the Ad on screen |
