@@ -22,6 +22,6 @@
         <attr name="orientation" format="string" />
         <attr name="gps" format="string" />
         <attr name="creativesSize" format="string" />
-        <attr name="blockAdUrl" format="string" />
+        <attr name="adHashUrl" format="string" />
     </declare-styleable>
 </resources>

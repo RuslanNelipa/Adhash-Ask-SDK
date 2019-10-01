@@ -2,15 +2,12 @@ package org.adhash.sdk.adhashask.view
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -51,7 +48,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
     /*Attributes*/
     var errorDrawable: Drawable? = null
     var screenshotUrl: String? = null
-    var blockedAdUrl: String? = null
+    var adHashUrl: String? = null
 
     var publisherId: String? = null
         set(value) = vm.setUserProperties(publisherId = value)
@@ -157,7 +154,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
         ivAdHash = findViewById(R.id.ivAdHash)
         ivBlock = findViewById(R.id.ivBlock)
         ivBlock.setOnClickListener {
-            blockedAdUrl?.let {
+            adHashUrl?.let {
                 openUrl(vm.attachRecentAdId(it))
             }
         }
@@ -174,7 +171,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
             adTagId = attributes.getString(R.styleable.AdHashView_adTagId)
             adOrder = attributes.getInteger(R.styleable.AdHashView_adOrder, 0)
             analyticsUrl = attributes.getString(R.styleable.AdHashView_analyticsUrl)
-            blockedAdUrl = attributes.getString(R.styleable.AdHashView_blockAdUrl)
+            adHashUrl = attributes.getString(R.styleable.AdHashView_adHashUrl)
             timezone = attributes.getInt(R.styleable.AdHashView_timezone, 0)
             location = attributes.getString(R.styleable.AdHashView_location)
             screenWidth = attributes.getInt(R.styleable.AdHashView_screenWidth, 0)
