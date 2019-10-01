@@ -41,7 +41,7 @@ dependencies{
 |version | 1 | Version of SKD usage. Set by user |
 |adTagId | middle of screen | Text form. Identifier for location of Ad on screen |
 |adOrder | 1 | Order of the Ad on screen |
-|analyticsUrl | http://website.com |  |
+|analyticsUrl | http://website.com | URL which will be called as GET request with advertiser parameters |
 |timezone | -3 | Timezone, stands for GMT+3:00 |
 |location | com.package.net | unique application identifier |
 |screenWidth | 1366 | Screen width |
