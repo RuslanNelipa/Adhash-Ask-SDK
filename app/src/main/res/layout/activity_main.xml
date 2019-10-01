@@ -8,15 +8,26 @@
 
     <org.adhash.sdk.adhashask.view.AdHashView
         android:id="@+id/adView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:publisherId="0x36016ae83df47035679f2e5d2c490c804a45ca9b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
         app:analyticsUrl="http://google.com"
+        app:blockAdUrl="http://google.com"
+        app:screenshotUrl="http://google.com"
         app:creativesSize="300x250"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:blockAdHeight="24dp"
+        app:blockAdWidth="24dp"
+        app:adOrder="1"
+        app:adTagId="center"
+        app:errorDrawable="@android:drawable/ic_delete"
+        app:layout_constraintBottom_toTopOf="@+id/setPropertyBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/showBtn"
+        app:publisherId="0x36016ae83df47035679f2e5d2c490c804a45ca9b" />
 
     <Button
         android:id="@+id/showBtn"

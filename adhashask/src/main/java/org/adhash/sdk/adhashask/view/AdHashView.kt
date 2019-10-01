@@ -5,6 +5,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Handler
@@ -29,7 +30,7 @@ import org.adhash.sdk.adhashask.utils.SystemInfo
 
 private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 
-private const val SCREENSHOT_HANDLER_DELAY = 2000L
+private const val SCREENSHOT_HANDLER_DELAY = 3000L
 
 class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
 
@@ -162,18 +163,21 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
 
         ivAdHash = findViewById(R.id.ivAdHash)
         ivBlock = findViewById(R.id.ivBlock)
-
-        safeLet(blockAdHeight, blockAdWidth){ height, width ->
-            if (blockAdWidth?.compareTo(0) == 1 && blockAdHeight?.compareTo(0) == 1) {
-                ivBlock.layoutParams.height = height.toInt()
-                ivBlock.layoutParams.width = width.toInt()
-            }
-        }
-
         ivBlock.setOnClickListener {
             blockedAdUrl?.let {
                 openUrl(blockedAdUrl)
                 vm.addToBlockedList()
+            }
+        }
+    }
+
+    private fun setBlockAdSize(){
+        safeLet(blockAdHeight, blockAdWidth){ height, width ->
+            if (blockAdWidth?.compareTo(0) == 1 && blockAdHeight?.compareTo(0) == 1) {
+                val params = ivBlock.layoutParams
+                params?.height = height.toInt()
+                params?.width = width.toInt()
+                ivBlock.layoutParams = params
             }
         }
     }
@@ -250,11 +254,13 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
     private fun handleError(reason: String) {
         Log.e(TAG, "Ad load failed: $reason")
         onError?.invoke(reason)
-        ivBlock.setImageDrawable(errorDrawable)
+        ivAdHash.setImageDrawable(errorDrawable)
     }
 
     private fun loadAdBitmap(bitmap: Bitmap, recentAd: RecentAd) {
-        ivBlock.setImageBitmap(bitmap)
+        ivAdHash.setImageBitmap(bitmap)
+        ivBlock.setImageResource(R.drawable.ic_adhash)
+        setBlockAdSize()
         vm.onAdDisplayed(recentAd)
     }
 

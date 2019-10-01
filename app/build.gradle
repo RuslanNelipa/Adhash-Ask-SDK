@@ -32,7 +32,20 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'org.adhash.sdk:adhashsdk:1.0.22'
+//    implementation 'org.adhash.sdk:adhashsdk:1.0.25'
+    implementation project(':adhashask')
+
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    def okhttpVersion = "4.2.0"
+    implementation 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+    implementation 'com.squareup.okhttp3:logging-interceptor:' + okhttpVersion
+    implementation 'com.squareup.okio:okio:2.2.2'
+
+    def retrofitVersion = "2.6.2"
+    implementation 'com.squareup.retrofit2:retrofit:' + retrofitVersion
+    implementation 'com.squareup.retrofit2:converter-gson:' + retrofitVersion
+    implementation 'com.squareup.retrofit2:converter-scalars:' + retrofitVersion
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
