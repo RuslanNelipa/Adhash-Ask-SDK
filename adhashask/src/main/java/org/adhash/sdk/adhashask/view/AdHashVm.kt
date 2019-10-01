@@ -187,7 +187,6 @@ class AdHashVm(
                 isp = getCarrierId()
                 recentAdvertisers = adsStorage.getAllRecentAds()
                 url = dataEncryptor.encryptUtf8(uri)
-                blockedAdvertisers = adsStorage.getAllBlockedAds()
             }
         }
         Log.d(TAG, "Initial bidder creation complete")
@@ -438,13 +437,25 @@ class AdHashVm(
 
     private fun String.isAdExpected(expectedHashes: ArrayList<String>): Boolean = this.let(expectedHashes::contains)
 
-    fun addToBlockedList() {
-        adsStorage
-            .getAllRecentAds()
-            .lastOrNull()
-            ?.let {
-                adsStorage.saveBlockedAd(it)
-                adBidderBody.blockedAdvertisers?.add(it.advertiserId)
+    fun attachRecentAdId(url: String): String? {
+        val adId = adsStorage.getAllRecentAds().lastOrNull()?.advertiserId
+
+        return adId?.let{
+            try {
+                val uri = Uri.parse(url)
+                val builder = Uri.Builder()
+                builder.scheme(uri.scheme)
+                    .authority(uri.authority)
+                    .path(uri.path)
+                    .query(uri.query)
+                    .fragment(uri.fragment)
+                    .appendQueryParameter("advertiserId", it)
+                    .build()
+                    .toString()
+            } catch (e: java.lang.Exception){
+                Log.e(TAG, "failed to append query")
+                url
             }
+        } ?: url
     }
 }

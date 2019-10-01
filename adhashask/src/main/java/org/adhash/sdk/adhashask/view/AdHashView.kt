@@ -1,9 +1,11 @@
 package org.adhash.sdk.adhashask.view
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
@@ -15,10 +17,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import com.google.gson.GsonBuilder
 import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.constants.Global
-import org.adhash.sdk.adhashask.ext.safeLet
 import org.adhash.sdk.adhashask.gps.GpsManager
 import org.adhash.sdk.adhashask.network.ApiClient
 import org.adhash.sdk.adhashask.pojo.AdSizes
@@ -26,13 +28,12 @@ import org.adhash.sdk.adhashask.pojo.RecentAd
 import org.adhash.sdk.adhashask.storage.AdsStorage
 import org.adhash.sdk.adhashask.utils.DataEncryptor
 import org.adhash.sdk.adhashask.utils.SystemInfo
-
+import org.adhash.sdk.adhashask.utils.screenshoter.ScreenshotData
+import org.adhash.sdk.adhashask.utils.screenshoter.ShotWatch
 
 private val TAG = Global.SDK_TAG + AdHashView::class.java.simpleName
 
-private const val SCREENSHOT_HANDLER_DELAY = 3000L
-
-class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs) {
+class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, attrs), ShotWatch.Listener {
 
     private val gson = GsonBuilder()
         .disableHtmlEscaping()
@@ -51,8 +52,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
     var errorDrawable: Drawable? = null
     var screenshotUrl: String? = null
     var blockedAdUrl: String? = null
-    var blockAdWidth: Float? = null
-    var blockAdHeight: Float? = null
 
     var publisherId: String? = null
         set(value) = vm.setUserProperties(publisherId = value)
@@ -98,13 +97,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
     private lateinit var ivBlock: ImageView
     private lateinit var ivAdHash: ImageView
 
-    private var screenshotUrlOpened = false
-    private val screenshotHandler = Handler()
-    private val screenshotRunnable by lazy {
-        val delay = SCREENSHOT_HANDLER_DELAY
-        val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        ScreenshotRunnable(delay, am)
-    }
+    private val shotWatch by lazy { ShotWatch(context.contentResolver, this) }
 
     init {
         consumeAttrs(attrs)
@@ -165,19 +158,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
         ivBlock = findViewById(R.id.ivBlock)
         ivBlock.setOnClickListener {
             blockedAdUrl?.let {
-                openUrl(blockedAdUrl)
-                vm.addToBlockedList()
-            }
-        }
-    }
-
-    private fun setBlockAdSize(){
-        safeLet(blockAdHeight, blockAdWidth){ height, width ->
-            if (blockAdWidth?.compareTo(0) == 1 && blockAdHeight?.compareTo(0) == 1) {
-                val params = ivBlock.layoutParams
-                params?.height = height.toInt()
-                params?.width = width.toInt()
-                ivBlock.layoutParams = params
+                openUrl(vm.attachRecentAdId(it))
             }
         }
     }
@@ -208,8 +189,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
             orientation = attributes.getString(R.styleable.AdHashView_orientation)
             gps = attributes.getString(R.styleable.AdHashView_gps)
             creativesSize = attributes.getString(R.styleable.AdHashView_creativesSize)
-            blockAdWidth = attributes.getDimension(R.styleable.AdHashView_blockAdWidth, -1f)
-            blockAdHeight = attributes.getDimension(R.styleable.AdHashView_blockAdHeight, -1f)
             Log.d(TAG, "Attributes extracted")
 
         } catch (e: Exception) {
@@ -260,7 +239,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
     private fun loadAdBitmap(bitmap: Bitmap, recentAd: RecentAd) {
         ivAdHash.setImageBitmap(bitmap)
         ivBlock.setImageResource(R.drawable.ic_adhash)
-        setBlockAdSize()
         vm.onAdDisplayed(recentAd)
     }
 
@@ -282,28 +260,23 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
 
     private fun detectScreenShotService() {
         screenshotUrl?.let {
-            screenshotHandler.postDelayed(screenshotRunnable, SCREENSHOT_HANDLER_DELAY)
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                shotWatch.register()
+            }
         }
     }
 
     private fun stopDetectingScreenshots() {
-        screenshotHandler.removeCallbacks(screenshotRunnable)
+        screenshotUrl?.let {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                shotWatch.unregister()
+            }
+        }
     }
 
-    private inner class ScreenshotRunnable(
-        private val delay: Long,
-        private val activityManager: ActivityManager
-    ) : Runnable {
-        override fun run() {
-            activityManager.getRunningServices(200)
-                .filter { it.process == "com.android.systemui:screenshot" }
-                .takeIf { !screenshotUrlOpened }
-                ?.forEach { _ ->
-                    openUrl(screenshotUrl)
-                    screenshotUrlOpened = true
-                }
-                ?.also { screenshotHandler.postDelayed(this, delay) }
 
-        }
+    override fun onScreenShotTaken(screenshotData: ScreenshotData?) {
+        Log.d(TAG, "Screenshot taken")
+        screenshotUrl?.let { openUrl(it) }
     }
 }
