@@ -20,7 +20,7 @@ ext {
     siteUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK'
     gitUrl = 'https://github.com/RuslanNelipa/Adhash-Ask-SDK.git'
 
-    libraryVersion = '1.0.25'
+    libraryVersion = '1.1.0'
 
     developerId = 'RuslanNelipa'
     developerName = 'Ruslan Nelipa'
@@ -76,8 +76,6 @@ dependencies {
     embed 'com.squareup.retrofit2:converter-gson:' + retrofitVersion
     embed 'com.squareup.retrofit2:converter-scalars:' + retrofitVersion
 }
-
-//configurations.embed.transitive = true
 
 if (project.rootProject.file('local.properties').exists()) {
     apply from: 'https://raw.githubusercontent.com/wajahatkarim3/JCenter-Gradle-Scripts/master/install.gradle'
