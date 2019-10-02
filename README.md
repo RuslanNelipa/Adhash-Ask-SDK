@@ -60,6 +60,7 @@ dependencies{
 
 ### Public methods
 1. Setters for properties
-2. Callback for Analytics sent result
-3. Request new Ad
-4. Callbacks for errors
+2. Request new Ad
+3. Callback for Analytics sent result
+4. Callback for errors
+5. Callback for loading
