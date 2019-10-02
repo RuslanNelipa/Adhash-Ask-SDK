@@ -140,6 +140,12 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
         vm.setAnalyticsCallbacks(onAnalyticsSuccess, onAnalyticsError)
     }
 
+    fun setLoadingCallback(
+        onLoading: (isLoading: Boolean) -> Unit
+    ) {
+        vm.setLoadingCallback(onLoading)
+    }
+
     fun setErrorCallback(
         onError: (error: String) -> Unit
     ) {

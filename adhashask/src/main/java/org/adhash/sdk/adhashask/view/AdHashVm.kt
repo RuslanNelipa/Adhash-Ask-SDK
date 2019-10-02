@@ -30,6 +30,7 @@ class AdHashVm(
 
     private lateinit var onBitmapReceived: (bmp: Bitmap, recentAd: RecentAd) -> Unit
     private lateinit var onError: (reason: String) -> Unit
+    private var onLoading: ((isLoading: Boolean) -> Unit)? = null
     private var onAnalyticsSuccess: ((body: String) -> Unit)? = null
     private var onAnalyticsError: ((body: Throwable) -> Unit)? = null
 
@@ -104,6 +105,12 @@ class AdHashVm(
     ) {
         this.onAnalyticsSuccess = onAnalyticsSuccess
         this.onAnalyticsError = onAnalyticsError
+    }
+
+    fun setLoadingCallback(
+        onLoading: (isLoading: Boolean) -> Unit
+    ) {
+        this.onLoading = onLoading
     }
 
     fun buildBidderProperty(
@@ -208,7 +215,7 @@ class AdHashVm(
     /*STEP 1*/
     private fun fetchBidder() {
         Log.d(TAG, "Fetching bidder AD: ${adBidderBody.let(dataEncryptor::json)}")
-
+        onLoading?.invoke(true)
         apiClient.getAdBidder(adBidderBody,
             onSuccess = { adBidderResponse ->
                 callAdvertiserUrl(adBidderBody, adBidderResponse)
@@ -217,6 +224,7 @@ class AdHashVm(
             },
             onError = { error ->
                 Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also(onError))
+                onLoading?.invoke(false)
             }
         )
     }
@@ -274,6 +282,7 @@ class AdHashVm(
                 },
                 onError = { error ->
                     Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also(onError))
+                    onLoading?.invoke(false)
                 }
             )
 
@@ -307,8 +316,12 @@ class AdHashVm(
                     )
 
                     decryptUrl(adBidderResponse, advertiser.url, adId, nonce, period)
+                    onLoading?.invoke(false)
                 }
-                ?: run { Log.e(TAG, "Failed to extract bitmap".also(onError)) }
+                ?: run {
+                    Log.e(TAG, "Failed to extract bitmap".also(onError))
+                    onLoading?.invoke(false)
+                }
 
         } else {
             Log.e(TAG, "Advertiser not expected".also(onError))
@@ -440,7 +453,7 @@ class AdHashVm(
     fun attachRecentAdId(url: String): String? {
         val adId = adsStorage.getAllRecentAds().lastOrNull()?.advertiserId
 
-        return adId?.let{
+        return adId?.let {
             try {
                 val uri = Uri.parse(url)
                 val builder = Uri.Builder()
@@ -452,7 +465,7 @@ class AdHashVm(
                     .appendQueryParameter("advertiserId", it)
                     .build()
                     .toString()
-            } catch (e: java.lang.Exception){
+            } catch (e: java.lang.Exception) {
                 Log.e(TAG, "failed to append query")
                 url
             }
