@@ -28,8 +28,8 @@ class AdHashVm(
     private var builderStatesList = mutableListOf<InfoBuildState>()
     private var completeBuilderState = InfoBuildState.values().asList()
 
-    private lateinit var onBitmapReceived: (bmp: Bitmap, recentAd: RecentAd) -> Unit
-    private lateinit var onError: (reason: String) -> Unit
+    private var onBitmapReceived: ((bmp: Bitmap, recentAd: RecentAd) -> Unit)? = null
+    private var onError: ((reason: String) -> Unit)? = null
     private var onLoading: ((isLoading: Boolean) -> Unit)? = null
     private var onAnalyticsSuccess: ((body: String) -> Unit)? = null
     private var onAnalyticsError: ((body: Throwable) -> Unit)? = null
@@ -164,7 +164,7 @@ class AdHashVm(
         if (builderStatesList.containsAll(completeBuilderState)) {
             fetchBidder()
         } else {
-            onError("Not all info given")
+            onError?.invoke("Not all info given")
         }
     }
 
@@ -223,7 +223,7 @@ class AdHashVm(
 
             },
             onError = { error ->
-                Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also(onError))
+                Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also { onError?.invoke(it) })
                 onLoading?.invoke(false)
             }
         )
@@ -281,13 +281,13 @@ class AdHashVm(
                     )
                 },
                 onError = { error ->
-                    Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also(onError))
+                    Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also { onError?.invoke(it) })
                     onLoading?.invoke(false)
                 }
             )
 
         } ?: run {
-            Log.e(TAG, "Creatives are null".also(onError))
+            Log.e(TAG, "Creatives are null".also { onError?.invoke(it) })
         }
     }
 
@@ -306,7 +306,7 @@ class AdHashVm(
         if (adId.isAdExpected(expectedHashes)) {
             dataEncryptor.getImageFromData(advertiser.data)
                 ?.let { bmp ->
-                    onBitmapReceived(
+                    onBitmapReceived?.invoke(
                         bmp, RecentAd(
                             timestamp = systemInfo.getTimeInUnix(),
                             advertiserId = advertiserId,
@@ -319,12 +319,12 @@ class AdHashVm(
                     onLoading?.invoke(false)
                 }
                 ?: run {
-                    Log.e(TAG, "Failed to extract bitmap".also(onError))
+                    Log.e(TAG, "Failed to extract bitmap".also { onError?.invoke(it) })
                     onLoading?.invoke(false)
                 }
 
         } else {
-            Log.e(TAG, "Advertiser not expected".also(onError))
+            Log.e(TAG, "Advertiser not expected".also { onError?.invoke(it) })
         }
     }
 
