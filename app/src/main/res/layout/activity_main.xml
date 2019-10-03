@@ -20,6 +20,7 @@
         app:creativesSize="300x250"
         app:adOrder="1"
         app:adTagId="center"
+        app:loadAdOnStart="true"
         app:errorDrawable="@android:drawable/ic_delete"
         app:layout_constraintBottom_toTopOf="@+id/setPropertyBtn"
         app:layout_constraintEnd_toEndOf="parent"

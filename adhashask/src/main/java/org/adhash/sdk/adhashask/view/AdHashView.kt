@@ -168,7 +168,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
 
     private fun consumeAttrs(attrs: AttributeSet?) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.AdHashView)
-
+        var loadAdOnStart: Boolean? = null
         try {
             publisherId = attributes.getString(R.styleable.AdHashView_publisherId)
             errorDrawable = attributes.getDrawable(R.styleable.AdHashView_errorDrawable)
@@ -192,6 +192,7 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
             orientation = attributes.getString(R.styleable.AdHashView_orientation)
             gps = attributes.getString(R.styleable.AdHashView_gps)
             creativesSize = attributes.getString(R.styleable.AdHashView_creativesSize)
+            loadAdOnStart = attributes.getBoolean(R.styleable.AdHashView_loadAdOnStart, false)
             Log.d(TAG, "Attributes extracted")
 
         } catch (e: Exception) {
@@ -199,7 +200,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
         } finally {
             attributes.recycle()
             vm.buildBidderProperty(publisherId = publisherId)
-
             vm.setUserProperties(
                 adTagId = adTagId,
                 version = version,
@@ -220,6 +220,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
                 gps = gps,
                 creativesSize = creativesSize
             )
+
+            if (loadAdOnStart == true) vm.fetchBidderAttempt()
         }
     }
 

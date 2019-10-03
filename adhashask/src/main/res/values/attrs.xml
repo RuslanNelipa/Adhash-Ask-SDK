@@ -23,5 +23,6 @@
         <attr name="gps" format="string" />
         <attr name="creativesSize" format="string" />
         <attr name="adHashUrl" format="string" />
+        <attr name="loadAdOnStart" format="boolean" />
     </declare-styleable>
 </resources>

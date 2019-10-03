@@ -39,6 +39,7 @@ class AdHashVm(
     private var version: String? = null
     private var adOrder: Int? = null
     private var analyticsUrl: String? = null
+    private var pendingAdRequest = false
 
     enum class InfoBuildState {
         PublisherId, Gps, Creatives
@@ -163,13 +164,17 @@ class AdHashVm(
     fun fetchBidderAttempt() {
         if (builderStatesList.containsAll(completeBuilderState)) {
             fetchBidder()
+
         } else {
-            onError?.invoke("Not all info given")
+            pendingAdRequest = true
         }
     }
 
     private fun addBuilderState(state: InfoBuildState) {
         builderStatesList.add(state)
+        if (pendingAdRequest){
+            fetchBidderAttempt()
+        }
     }
 
     private fun buildInitialAdBidder(systemInfo: SystemInfo) {
@@ -215,6 +220,7 @@ class AdHashVm(
     /*STEP 1*/
     private fun fetchBidder() {
         Log.d(TAG, "Fetching bidder AD: ${adBidderBody.let(dataEncryptor::json)}")
+        pendingAdRequest = false
         onLoading?.invoke(true)
         apiClient.getAdBidder(adBidderBody,
             onSuccess = { adBidderResponse ->
