@@ -173,16 +173,16 @@ class AdHashVm(
 
     private fun addBuilderState(state: InfoBuildState) {
         builderStatesList.add(state)
-        if (pendingAdRequest){
+        if (pendingAdRequest) {
             fetchBidderAttempt()
         }
     }
 
-    private fun verifyCacheClear(){
+    private fun verifyCacheClear() {
         val currentVersion = systemInfo.getLibraryVersion()
         val lastVersion = adsStorage.getLastVersion()
 
-        if (lastVersion != currentVersion){
+        if (lastVersion != currentVersion) {
             adsStorage.clear()
             adsStorage.saveVersion(currentVersion)
         }
@@ -240,7 +240,7 @@ class AdHashVm(
 
             },
             onError = { error ->
-                Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also { onError?.invoke(it) })
+                Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}, message: ${error.errorMessage}".also { onError?.invoke(it) })
                 onLoading?.invoke(false)
             }
         )
@@ -298,7 +298,7 @@ class AdHashVm(
                     )
                 },
                 onError = { error ->
-                    Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}".also { onError?.invoke(it) })
+                    Log.e(TAG, "Fetching bidder failed with error: ${error.errorCase}, message: ${error.errorMessage}".also { onError?.invoke(it) })
                     onLoading?.invoke(false)
                 }
             )
@@ -321,24 +321,22 @@ class AdHashVm(
         val adId = dataEncryptor.sha1(advertiser.data)
 
         if (adId.isAdExpected(expectedHashes)) {
-            dataEncryptor.getImageFromData(advertiser.data)
-                ?.let { bmp ->
-                    onBitmapReceived?.invoke(
-                        bmp, RecentAd(
-                            timestamp = systemInfo.getTimeInUnix(),
-                            advertiserId = advertiserId,
-                            campaignId = campaignId,
-                            adId = adId
-                        )
+            dataEncryptor.getImageFromData(advertiser.data)?.let { bmp ->
+                onBitmapReceived?.invoke(
+                    bmp, RecentAd(
+                        timestamp = systemInfo.getTimeInUnix(),
+                        advertiserId = advertiserId,
+                        campaignId = campaignId,
+                        adId = adId
                     )
+                )
 
-                    decryptUrl(adBidderResponse, advertiser.url, adId, nonce, period)
-                    onLoading?.invoke(false)
-                }
-                ?: run {
-                    Log.e(TAG, "Failed to extract bitmap".also { onError?.invoke(it) })
-                    onLoading?.invoke(false)
-                }
+                decryptUrl(adBidderResponse, advertiser.url, adId, nonce, period)
+                onLoading?.invoke(false)
+            } ?: run {
+                Log.e(TAG, "Failed to extract bitmap from data: ${advertiser.data}".also { onError?.invoke(it) })
+                onLoading?.invoke(false)
+            }
 
         } else {
             Log.e(TAG, "Advertiser not expected".also { onError?.invoke(it) })
