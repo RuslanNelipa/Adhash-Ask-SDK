@@ -11,39 +11,40 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        app:analyticsUrl="http://google.com"
         app:adHashUrl="http://google.com"
-        app:screenshotUrl="http://google.com"
-        app:creativesSize="300x250"
         app:adOrder="1"
         app:adTagId="center"
-        app:loadAdOnStart="true"
+        app:analyticsUrl="http://google.com"
+        app:creativesSize="300x250"
         app:errorDrawable="@android:drawable/ic_delete"
-        app:layout_constraintBottom_toTopOf="@+id/setPropertyBtn"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/showBtn"
-        app:publisherId="0x36016ae83df47035679f2e5d2c490c804a45ca9b" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:loadAdOnStart="true"
+        app:screenshotUrl="http://google.com" />
 
     <Button
         android:id="@+id/showBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="New Ad"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/setPropertyBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
         android:text="Set property"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ProgressBar
@@ -52,9 +53,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/adView"
+        app:layout_constraintEnd_toEndOf="@id/adView"
+        app:layout_constraintStart_toStartOf="@id/adView"
+        app:layout_constraintTop_toBottomOf="@id/adView" />
+
+    <TextView
+        android:id="@+id/errorTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

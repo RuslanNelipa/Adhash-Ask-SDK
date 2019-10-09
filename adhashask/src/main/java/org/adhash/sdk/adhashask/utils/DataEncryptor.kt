@@ -13,6 +13,7 @@ import com.google.gson.Gson
 import java.net.URL
 import java.net.URLEncoder
 import java.security.MessageDigest
+import java.util.logging.Handler
 
 private const val AES_KEY = "DECRYPTED:"
 
@@ -59,7 +60,7 @@ class DataEncryptor(private val gson: Gson) {
 
     @SuppressLint("SetJavaScriptEnabled")
     fun aes256(context: Context, url: String, key: String, onReceived: (url: String) -> Unit) {
-        WebView(context)
+        WebView(context.applicationContext)
             .apply {
                 settings.javaScriptEnabled = true
                 webChromeClient = object : WebChromeClient() {

@@ -46,6 +46,7 @@ class AdHashVm(
     }
 
     init {
+        verifyCacheClear()
         buildInitialAdBidder(systemInfo)
     }
 
@@ -174,6 +175,16 @@ class AdHashVm(
         builderStatesList.add(state)
         if (pendingAdRequest){
             fetchBidderAttempt()
+        }
+    }
+
+    private fun verifyCacheClear(){
+        val currentVersion = systemInfo.getLibraryVersion()
+        val lastVersion = adsStorage.getLastVersion()
+
+        if (lastVersion != currentVersion){
+            adsStorage.clear()
+            adsStorage.saveVersion(currentVersion)
         }
     }
 

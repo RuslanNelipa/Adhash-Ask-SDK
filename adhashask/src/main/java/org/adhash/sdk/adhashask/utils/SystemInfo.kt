@@ -11,6 +11,7 @@ import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityManager
+import org.adhash.sdk.BuildConfig
 import org.adhash.sdk.adhashask.constants.ConnectionType
 import org.adhash.sdk.adhashask.constants.DeviceType
 import org.adhash.sdk.adhashask.constants.Orientation
@@ -171,4 +172,6 @@ class SystemInfo(private val context: Context) {
 
 
     private fun getVersionCode() = Build.VERSION.SDK_INT
+
+    fun getLibraryVersion() = BuildConfig.VERSION_NAME
 }
