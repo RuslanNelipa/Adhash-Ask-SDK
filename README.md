@@ -57,6 +57,7 @@ dependencies{
 |gps | - |30.3030303, 40.4040404 | coordinates. SDK tries to fetch it automatically of LOCATION permission is granted |
 |creativesSize | - |300x250 | size in pixels of requested Ad |
 |adHashUrl | - |http://website.com | URL which will be opened when user clicks on AH icon |
+| loadAdOnStart | - | true\false | trigger to load first ad as only view attached |
 
 ### Public methods
 1. Setters for properties
