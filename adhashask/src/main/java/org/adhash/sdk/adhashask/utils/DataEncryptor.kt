@@ -13,7 +13,6 @@ import com.google.gson.Gson
 import java.net.URL
 import java.net.URLEncoder
 import java.security.MessageDigest
-import java.util.logging.Handler
 
 private const val AES_KEY = "DECRYPTED:"
 

@@ -334,7 +334,10 @@ class AdHashVm(
                 decryptUrl(adBidderResponse, advertiser.url, adId, nonce, period)
                 onLoading?.invoke(false)
             } ?: run {
-                Log.e(TAG, "Failed to extract bitmap from data: ${advertiser.data}".also { onError?.invoke(it) })
+                Log.e(TAG, "Failed to extract bitmap from advertiser data".also { onError?.invoke(it) })
+                advertiser.data.chunked(1000).forEach {
+                    Log.e(TAG, it)
+                }
                 onLoading?.invoke(false)
             }
 
