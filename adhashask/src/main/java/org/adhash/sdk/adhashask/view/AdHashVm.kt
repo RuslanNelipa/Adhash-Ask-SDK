@@ -320,29 +320,32 @@ class AdHashVm(
         /*STEP 5*/
         val adId = dataEncryptor.sha1(advertiser.data)
 
-        if (adId.isAdExpected(expectedHashes)) {
-            dataEncryptor.getImageFromData(advertiser.data)?.let { bmp ->
-                onBitmapReceived?.invoke(
-                    bmp, RecentAd(
-                        timestamp = systemInfo.getTimeInUnix(),
-                        advertiserId = advertiserId,
-                        campaignId = campaignId,
-                        adId = adId
-                    )
-                )
+        if (!adId.isAdExpected(expectedHashes)) {
+            Log.e(TAG, "Advertiser not expected".also { onError?.invoke(it) })
+            return
+        }
 
-                decryptUrl(adBidderResponse, advertiser.url, adId, nonce, period)
-                onLoading?.invoke(false)
-            } ?: run {
-                Log.e(TAG, "Failed to extract bitmap from advertiser data".also { onError?.invoke(it) })
-                advertiser.data.chunked(1000).forEach {
-                    Log.e(TAG, it)
-                }
-                onLoading?.invoke(false)
-            }
+        val bmp = dataEncryptor.getImageFromData(advertiser.data)
+
+        if (bmp != null) {
+            onBitmapReceived?.invoke(
+                bmp, RecentAd(
+                    timestamp = systemInfo.getTimeInUnix(),
+                    advertiserId = advertiserId,
+                    campaignId = campaignId,
+                    adId = adId
+                )
+            )
+
+            decryptUrl(adBidderResponse, advertiser.url, adId, nonce, period)
+            onLoading?.invoke(false)
 
         } else {
-            Log.e(TAG, "Advertiser not expected".also { onError?.invoke(it) })
+            Log.e(TAG, "Failed to extract bitmap from advertiser data".also { onError?.invoke(it) })
+            advertiser.data.chunked(1000).forEach {
+                Log.e(TAG, it)
+            }
+            onLoading?.invoke(false)
         }
     }
 
