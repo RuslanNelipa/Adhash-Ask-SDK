@@ -20,7 +20,7 @@
         app:adOrder="1"
         app:adTagId="center"
         app:errorDrawable="@android:drawable/ic_delete"
-        app:publisherId="0x36016ae83df471d11332e5d2c490c804a45ca9b"
+        app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
         app:loadAdOnStart="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

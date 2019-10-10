@@ -22,9 +22,11 @@ import kotlin.math.sqrt
 class SystemInfo(private val context: Context) {
 
     fun getTimeZone(): Int {
-        var timeZone = TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)
-        timeZone = timeZone.substring(3, 6)
-        return timeZone.toInt()
+        val timeZone = TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT)
+        return timeZone.takeIf { it.length > 6 }
+            ?.let { timeZone.substring(3, 6) }
+            ?.toInt()
+            ?: 0
     }
 
     fun getScreenHeight(): Int {
