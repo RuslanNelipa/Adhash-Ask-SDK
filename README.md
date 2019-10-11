@@ -25,11 +25,12 @@ dependencies{
 ```
 
 ### How to use
-1) Add to layout. `publisherId` is required to make library work properly.
+1) Add to layout. `publisherId` and `analyticsUrl` are required to make library work properly.
 ```xml
 <org.adhash.sdk.adhashask.view.AdHashView
         ....
-        app:publisherId="0x36016ae83df471d11332e5d2c490c804a45ca9b" />
+        app:publisherId="0x36016ae83df471d11332e5d2c490c804a45ca9b"
+        app:analyticsUrl="https://website.com" />
 ```
 2) Other available parameters:
 
