@@ -230,13 +230,13 @@ class AdHashVm(
 
     /*STEP 1*/
     private fun fetchBidder() {
-        Log.d(TAG, "Fetching bidder AD: ${adBidderBody.let(dataEncryptor::json)}")
+        Log.e(TAG, "Fetching bidder AD: ${adBidderBody.let(dataEncryptor::json)}")
         pendingAdRequest = false
         onLoading?.invoke(true)
         apiClient.getAdBidder(adBidderBody,
             onSuccess = { adBidderResponse ->
                 callAdvertiserUrl(adBidderBody, adBidderResponse)
-                Log.d(TAG, "AdBidder response: ${adBidderResponse.let(dataEncryptor::json)}")
+                Log.e(TAG, "AdBidder response: ${adBidderResponse.let(dataEncryptor::json)}")
 
             },
             onError = { error ->

@@ -6,26 +6,180 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <org.adhash.sdk.adhashask.view.AdHashView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-
-        app:analyticsUrl="http://google.com"
-        app:adHashUrl="http://google.com"
-        app:screenshotUrl="http://google.com"
-        app:creativesSize="300x250"
-        app:adOrder="1"
-        app:adTagId="center"
-        app:errorDrawable="@android:drawable/ic_delete"
-        app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
-        app:loadAdOnStart="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/showBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="300x250"/>
+
+            <org.adhash.sdk.adhashask.view.AdHashView
+                android:id="@+id/adView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:adHashUrl="http://google.com"
+                app:adOrder="1"
+                app:adTagId="center"
+                app:analyticsUrl="http://google.com"
+                app:creativesSize="300x250"
+                app:errorDrawable="@android:drawable/ic_delete"
+                app:loadAdOnStart="true"
+                app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
+                app:screenshotUrl="http://google.com" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="160x600"/>
+
+            <org.adhash.sdk.adhashask.view.AdHashView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:adHashUrl="http://google.com"
+                app:adOrder="1"
+                app:adTagId="center"
+                app:analyticsUrl="http://google.com"
+                app:creativesSize="160x600"
+                app:errorDrawable="@android:drawable/ic_delete"
+                app:loadAdOnStart="true"
+                app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
+                app:screenshotUrl="http://google.com" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="250x250"/>
+
+            <org.adhash.sdk.adhashask.view.AdHashView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:adHashUrl="http://google.com"
+                app:adOrder="1"
+                app:adTagId="center"
+                app:analyticsUrl="http://google.com"
+                app:creativesSize="250x250"
+                app:errorDrawable="@android:drawable/ic_delete"
+                app:loadAdOnStart="true"
+                app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
+                app:screenshotUrl="http://google.com" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="320x480"/>
+
+            <org.adhash.sdk.adhashask.view.AdHashView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:adHashUrl="http://google.com"
+                app:adOrder="1"
+                app:adTagId="center"
+                app:analyticsUrl="http://google.com"
+                app:creativesSize="320x480"
+                app:errorDrawable="@android:drawable/ic_delete"
+                app:loadAdOnStart="true"
+                app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
+                app:screenshotUrl="http://google.com" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="300x600"/>
+
+            <org.adhash.sdk.adhashask.view.AdHashView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:adHashUrl="http://google.com"
+                app:adOrder="1"
+                app:adTagId="center"
+                app:analyticsUrl="http://google.com"
+                app:creativesSize="300x600"
+                app:errorDrawable="@android:drawable/ic_delete"
+                app:loadAdOnStart="true"
+                app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
+                app:screenshotUrl="http://google.com" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="320x100"/>
+
+            <org.adhash.sdk.adhashask.view.AdHashView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:adHashUrl="http://google.com"
+                app:adOrder="1"
+                app:adTagId="center"
+                app:analyticsUrl="http://google.com"
+                app:creativesSize="320x100"
+                app:errorDrawable="@android:drawable/ic_delete"
+                app:loadAdOnStart="true"
+                app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
+                app:screenshotUrl="http://google.com" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="728x90"/>
+
+            <org.adhash.sdk.adhashask.view.AdHashView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:adHashUrl="http://google.com"
+                app:adOrder="1"
+                app:adTagId="center"
+                app:analyticsUrl="http://google.com"
+                app:creativesSize="728x90"
+                app:errorDrawable="@android:drawable/ic_delete"
+                app:loadAdOnStart="true"
+                app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
+                app:screenshotUrl="http://google.com" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="970x250"/>
+
+            <org.adhash.sdk.adhashask.view.AdHashView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:adHashUrl="http://google.com"
+                app:adOrder="1"
+                app:adTagId="center"
+                app:analyticsUrl="http://google.com"
+                app:creativesSize="970x250"
+                app:errorDrawable="@android:drawable/ic_delete"
+                app:loadAdOnStart="true"
+                app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
+                app:screenshotUrl="http://google.com" />
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
 
     <Button
         android:id="@+id/showBtn"
@@ -33,7 +187,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="New Ad"
+        android:text="Update first"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.95"
@@ -55,10 +209,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/adView"
-        app:layout_constraintEnd_toEndOf="@id/adView"
-        app:layout_constraintStart_toStartOf="@id/adView"
-        app:layout_constraintTop_toBottomOf="@id/adView" />
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="parent" />
 
     <TextView
         android:id="@+id/errorTv"

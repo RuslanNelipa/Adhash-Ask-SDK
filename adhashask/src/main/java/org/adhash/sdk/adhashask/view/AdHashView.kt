@@ -152,7 +152,10 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
         this.onError = onError
     }
 
-    fun requestNewAd() = vm.fetchBidderAttempt()
+    fun requestNewAd() {
+        ivBlock.visibility = View.GONE
+        vm.fetchBidderAttempt()
+    }
 
     private fun inflate() {
         View.inflate(context, R.layout.adhash_view, this)
@@ -239,11 +242,13 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
         Log.e(TAG, "Ad load failed: $reason")
         onError?.invoke(reason)
         ivAdHash.setImageDrawable(errorDrawable)
+        ivBlock.visibility = View.GONE
     }
 
     private fun loadAdBitmap(bitmap: Bitmap, recentAd: RecentAd) {
         ivAdHash.setImageBitmap(bitmap)
         ivBlock.setImageResource(R.drawable.ic_adhash)
+        ivBlock.visibility = View.VISIBLE
         vm.onAdDisplayed(recentAd)
     }
 
