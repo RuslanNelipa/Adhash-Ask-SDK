@@ -41,7 +41,7 @@ dependencies{
 |version | - | 1 | Version of SKD usage. Set by user |
 |adTagId | - |middle of screen | Text form. Identifier for location of Ad on screen |
 |adOrder | - |1 | Order of the Ad on screen |
-|analyticsUrl | - |http://website.com | URL which will be called as GET request with advertiser parameters |
+|analyticsUrl | + |http://website.com | URL which will be called as GET request with advertiser parameters |
 |timezone | - |-3 | Timezone, stands for GMT+3:00 |
 |location | - |com.package.net | unique application identifier |
 |screenWidth | - |1366 | Screen width |
@@ -60,8 +60,7 @@ dependencies{
 | loadAdOnStart | - | true\false | trigger to load first ad as only view attached |
 
 ### Public methods
-1. Setters for properties
-2. Request new Ad
-3. Callback for Analytics sent result
-4. Callback for errors
-5. Callback for loading
+1. Setters for parameters from table above
+2. `AdView.requestNewAd()` - requests new Ad with all latest paramters
+3. `AdView.setLoadingCallback { isLoading -> }` - callback for loading state of the view
+4. `AdView.setErrorCallback { error -> }` - callback for errors received if any
