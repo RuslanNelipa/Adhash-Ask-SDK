@@ -162,7 +162,16 @@ class AdHashVm(
             ?.build()
     }
 
+    private fun throwExceptionForMandatoryFields() {
+        when {
+            adBidderBody.publisherId.isNullOrEmpty() -> throw RuntimeException("Publisher ID is missing or empty")
+            analyticsUrl.isNullOrEmpty() -> throw RuntimeException("Analytics URL is missing or empty")
+            else -> Unit
+        }
+    }
+
     fun fetchBidderAttempt() {
+
         if (builderStatesList.containsAll(completeBuilderState)) {
             fetchBidder()
 
@@ -230,13 +239,15 @@ class AdHashVm(
 
     /*STEP 1*/
     private fun fetchBidder() {
-        Log.e(TAG, "Fetching bidder AD: ${adBidderBody.let(dataEncryptor::json)}")
+        throwExceptionForMandatoryFields()
+
+        Log.d(TAG, "Fetching bidder AD: ${adBidderBody.let(dataEncryptor::json)}")
         pendingAdRequest = false
         onLoading?.invoke(true)
         apiClient.getAdBidder(adBidderBody,
             onSuccess = { adBidderResponse ->
                 callAdvertiserUrl(adBidderBody, adBidderResponse)
-                Log.e(TAG, "AdBidder response: ${adBidderResponse.let(dataEncryptor::json)}")
+                Log.d(TAG, "AdBidder response: ${adBidderResponse.let(dataEncryptor::json)}")
 
             },
             onError = { error ->

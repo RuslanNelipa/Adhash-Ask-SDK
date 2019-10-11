@@ -92,7 +92,6 @@
                 app:adHashUrl="http://google.com"
                 app:adOrder="1"
                 app:adTagId="center"
-                app:analyticsUrl="http://google.com"
                 app:creativesSize="320x480"
                 app:errorDrawable="@android:drawable/ic_delete"
                 app:loadAdOnStart="true"
