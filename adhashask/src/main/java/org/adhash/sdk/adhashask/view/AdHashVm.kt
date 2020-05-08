@@ -35,11 +35,19 @@ class AdHashVm(
     private var onAnalyticsError: ((body: Throwable) -> Unit)? = null
 
     private var uri: Uri? = null
+    private var uriBidder: Uri? = null
+    private var uriPublisher: Uri? = null
     private var adTagId: String? = null
     private var version: String? = null
     private var adOrder: Int? = null
     private var analyticsUrl: String? = null
+    private var bidderUrl: String? = null
+    private var publisherUrl: String? = null
     private var pendingAdRequest = false
+
+    private var creativeSize: String? = null
+
+    private var adBidderResponseData: AdBidderResponse? = null
 
     enum class InfoBuildState {
         PublisherId, Gps, Creatives
@@ -56,6 +64,8 @@ class AdHashVm(
         version: String? = null,
         adOrder: Int? = null,
         analyticsUrl: String? = null,
+        bidderUrl: String? = null,
+        publisherUrl: String? = null,
         timezone: Int? = null,
         location: String? = null,
         screenWidth: Int? = null,
@@ -75,6 +85,8 @@ class AdHashVm(
         version?.let { this.version = it }
         adOrder?.let { this.adOrder = it }
         analyticsUrl?.let { this.analyticsUrl = it }
+        bidderUrl?.let { this.bidderUrl = it }
+        publisherUrl?.let { this.publisherUrl = it }
         timezone?.let { adBidderBody.timezone = it }
         location?.let { adBidderBody.location = it }
         safeLet(screenWidth, screenHeight) { width, height -> adBidderBody.size = ScreenSize(width, height) }
@@ -93,6 +105,7 @@ class AdHashVm(
         creativesSize?.let {
             adBidderBody.creatives = arrayListOf(AdSizes(it))
             addBuilderState(InfoBuildState.Creatives)
+            updateCreativeSize(it)
         }
 
         publisherId?.let {
@@ -100,6 +113,12 @@ class AdHashVm(
             addBuilderState(InfoBuildState.PublisherId)
         }
     }
+
+    private fun updateCreativeSize(size: String) {
+        creativeSize = size
+    }
+
+    fun getCreativeSize() = creativeSize
 
     fun setAnalyticsCallbacks(
         onAnalyticsSuccess: (body: String) -> Unit,
@@ -153,6 +172,8 @@ class AdHashVm(
 
     fun getUri() = uri
 
+    fun getPublisherUri() = uriPublisher
+
     fun isTalkbackEnabled() = systemInfo.isTalkBackEnabled()
 
     fun attachCoordinatesToUri(x: Number, y: Number) {
@@ -162,10 +183,50 @@ class AdHashVm(
             ?.build()
     }
 
+    fun addBidderUri() {
+
+        try {
+            uriBidder = Uri.parse(bidderUrl?.substringBefore("?"))
+                .buildUpon()
+                .appendQueryParameter("action", bidderUrl?.substringAfter("="))
+                .appendQueryParameter("version", version.toString())
+                .appendQueryParameter("url", uri.toString())
+                .appendQueryParameter("budgetId", adBidderResponseData?.creatives?.firstOrNull()?.budgetId.toString())
+                .appendQueryParameter("bidId", adBidderResponseData?.creatives?.firstOrNull()?.bidId.toString())
+                .build()
+
+            Log.e(TAG, "Uri Bidder with parameters: $uriBidder")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to build bidder URL")
+        }
+
+    }
+
+    fun addPublisherUri() {
+
+        try {
+            uriPublisher = Uri.parse(publisherUrl?.substringBefore("?"))
+                .buildUpon()
+                .appendQueryParameter("action", publisherUrl?.substringAfter("="))
+                .appendQueryParameter("version", version.toString())
+                .appendQueryParameter("url", uriBidder.toString())
+                .build()
+
+            Log.e(TAG, "Uri Publisher with parameters: $uriPublisher")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to build publisher URL")
+        }
+
+    }
+
     private fun throwExceptionForMandatoryFields() {
         when {
             adBidderBody.publisherId.isNullOrEmpty() -> throw RuntimeException("Publisher ID is missing or empty")
             analyticsUrl.isNullOrEmpty() -> throw RuntimeException("Analytics URL is missing or empty")
+            bidderUrl.isNullOrEmpty() -> throw RuntimeException("Bidder URL is missing or empty")
+            publisherUrl.isNullOrEmpty() -> throw RuntimeException("Publisher URL is missing or empty")
             else -> Unit
         }
     }
@@ -263,6 +324,8 @@ class AdHashVm(
             ?.firstOrNull {
                 it.advertiserURL?.isNotEmpty() == true && it.expectedHashes?.isNotEmpty() == true
             }
+
+        adBidderResponseData = adBidderResponse
 
         safeLet(
             creatives?.advertiserId,
@@ -405,35 +468,34 @@ class AdHashVm(
         try {
             uri = Uri.parse(url)
                 .buildUpon()
-                .appendQueryParameter("adTagId ", adTagId)
-                .appendQueryParameter("publishedId ", adBidderBody.publisherId)
-                .appendQueryParameter("creativeHash ", adId)
-                .appendQueryParameter("advertiserId ", adBidderResponse.creatives?.firstOrNull()?.advertiserId)
-                .appendQueryParameter("location ", adBidderBody.location)
-                .appendQueryParameter("platform ", adBidderBody.navigator?.platform)
-                .appendQueryParameter("connection ", adBidderBody.connection)
-                .appendQueryParameter("isp ", adBidderBody.isp)
-                .appendQueryParameter("orientation ", adBidderBody.orientation)
-                .appendQueryParameter("gps ", adBidderBody.gps)
-                .appendQueryParameter("language ", adBidderBody.navigator?.language)
-                .appendQueryParameter("device ", adBidderBody.navigator?.model?.substringBefore(" "))
-                .appendQueryParameter("model ", adBidderBody.navigator?.model?.substringAfter(" "))
-                .appendQueryParameter("type ", adBidderBody.navigator?.type)
-                .appendQueryParameter("screenWidth ", adBidderBody.size?.screenWidth.toString())
-                .appendQueryParameter("screenHeight ", adBidderBody.size?.screenHeight.toString())
-                .appendQueryParameter("timeZone ", adBidderBody.timezone.toString())
-                .appendQueryParameter("width ", adBidderBody.creatives?.firstOrNull()?.size?.substringBefore("x"))
-                .appendQueryParameter("height ", adBidderBody.creatives?.firstOrNull()?.size?.substringAfter("x"))
-                .appendQueryParameter("period ", adBidderResponse.period.toString())
-                .appendQueryParameter("cost ", adBidderResponse.creatives?.firstOrNull()?.maxPrice.toString())
-                .appendQueryParameter("commission ", adBidderResponse.creatives?.firstOrNull()?.commission.toString())
-                .appendQueryParameter("nonce ", adBidderResponse.nonce.toString())
-                .appendQueryParameter("mobile ", true.toString())
-                .appendQueryParameter("budgetId ", adBidderResponse.creatives?.firstOrNull()?.budgetId.toString())
-                .appendQueryParameter("timestamp ", systemInfo.getTimeInUnix().toString())
-                .appendQueryParameter("version ", version.toString())
-                .appendQueryParameter("url ", version.toString())
+                .appendQueryParameter("adTagId", adTagId)
+                .appendQueryParameter("publisherId", adBidderBody.publisherId)
+                .appendQueryParameter("creativeHash", adId)
+                .appendQueryParameter("location", adBidderBody.location)
+                .appendQueryParameter("timeZone", adBidderBody.timezone.toString())
+                .appendQueryParameter("advertiserId", adBidderResponse.creatives?.firstOrNull()?.advertiserId)
+                .appendQueryParameter("platform", adBidderBody.navigator?.platform)
+                .appendQueryParameter("connection", adBidderBody.connection)
+                .appendQueryParameter("isp", adBidderBody.isp)
+                .appendQueryParameter("orientation", adBidderBody.orientation)
+                .appendQueryParameter("gps", adBidderBody.gps)
+                .appendQueryParameter("language", adBidderBody.navigator?.language)
+                .appendQueryParameter("device", adBidderBody.navigator?.model?.substringBefore(" "))
+                .appendQueryParameter("model", adBidderBody.navigator?.model?.substringAfter(" "))
+                .appendQueryParameter("type", adBidderBody.navigator?.type)
+                .appendQueryParameter("screenWidth", adBidderBody.size?.screenWidth.toString())
+                .appendQueryParameter("screenHeight", adBidderBody.size?.screenHeight.toString())
+                .appendQueryParameter("width", adBidderBody.creatives?.firstOrNull()?.size?.substringBefore("x"))
+                .appendQueryParameter("height", adBidderBody.creatives?.firstOrNull()?.size?.substringAfter("x"))
+                .appendQueryParameter("period", adBidderResponse.period.toString())
+                .appendQueryParameter("cost", adBidderResponse.creatives?.firstOrNull()?.maxPrice.toString())
+                .appendQueryParameter("nonce", adBidderResponse.nonce.toString())
+                .appendQueryParameter("commission", adBidderResponse.creatives?.firstOrNull()?.commission.toString())
+                .appendQueryParameter("budgetId", adBidderResponse.creatives?.firstOrNull()?.budgetId.toString())
+                .appendQueryParameter("timestamp", systemInfo.getTimeInUnix().toString())
                 .build()
+
+            Log.e(TAG, "Uri with parameters: $uri")
 
         } catch (e: Exception) {
             Log.e(TAG, "Failed to build click URL")
@@ -444,6 +506,7 @@ class AdHashVm(
     private fun callAnalyticsModule(adId: String, adBidderResponse: AdBidderResponse) {
         analyticsUrl?.let { url ->
             val analyticsQuery = AnalyticsBody(
+                version = version,
                 adTagId = adTagId,
                 publishedId = adBidderBody.publisherId,
                 creativeHash = adId,
@@ -487,14 +550,39 @@ class AdHashVm(
 
         return adId?.let {
             try {
-                val uri = Uri.parse(url)
+                val uri = Uri.parse(url.substringBefore("?"))
                 val builder = Uri.Builder()
                 builder.scheme(uri.scheme)
                     .authority(uri.authority)
                     .path(uri.path)
                     .query(uri.query)
                     .fragment(uri.fragment)
+                    .appendQueryParameter("action", url.substringAfter("="))
                     .appendQueryParameter("advertiserId", it)
+                    .appendQueryParameter("adTagId", adTagId)
+                    .appendQueryParameter("publisherId", adBidderBody.publisherId)
+                    .appendQueryParameter("creativeHash", adId)
+                    .appendQueryParameter("location", adBidderBody.location)
+                    .appendQueryParameter("timeZone", adBidderBody.timezone.toString())
+                    .appendQueryParameter("platform", adBidderBody.navigator?.platform)
+                    .appendQueryParameter("connection", adBidderBody.connection)
+                    .appendQueryParameter("isp", adBidderBody.isp)
+                    .appendQueryParameter("orientation", adBidderBody.orientation)
+                    .appendQueryParameter("gps", adBidderBody.gps)
+                    .appendQueryParameter("language", adBidderBody.navigator?.language)
+                    .appendQueryParameter("device", adBidderBody.navigator?.model?.substringBefore(" "))
+                    .appendQueryParameter("model", adBidderBody.navigator?.model?.substringAfter(" "))
+                    .appendQueryParameter("type", adBidderBody.navigator?.type)
+                    .appendQueryParameter("screenWidth", adBidderBody.size?.screenWidth.toString())
+                    .appendQueryParameter("screenHeight", adBidderBody.size?.screenHeight.toString())
+                    .appendQueryParameter("width", adBidderBody.creatives?.firstOrNull()?.size?.substringBefore("x"))
+                    .appendQueryParameter("height", adBidderBody.creatives?.firstOrNull()?.size?.substringAfter("x"))
+                    .appendQueryParameter("period", adBidderResponseData?.period.toString())
+                    .appendQueryParameter("cost", adBidderResponseData?.creatives?.firstOrNull()?.maxPrice.toString())
+                    .appendQueryParameter("nonce", adBidderResponseData?.nonce.toString())
+                    .appendQueryParameter("commission", adBidderResponseData?.creatives?.firstOrNull()?.commission.toString())
+                    .appendQueryParameter("budgetId", adBidderResponseData?.creatives?.firstOrNull()?.budgetId.toString())
+                    .appendQueryParameter("timestamp", systemInfo.getTimeInUnix().toString())
                     .build()
                     .toString()
             } catch (e: java.lang.Exception) {

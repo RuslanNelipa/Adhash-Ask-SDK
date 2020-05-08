@@ -9,12 +9,15 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.AttributeSet
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.gson.GsonBuilder
 import org.adhash.sdk.R
 import org.adhash.sdk.adhashask.constants.Global
@@ -60,6 +63,10 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
         set(value) = vm.setUserProperties(adOrder = value)
     var analyticsUrl: String? = null
         set(value) = vm.setUserProperties(analyticsUrl = value)
+    var bidderUrl: String? = null
+        set(value) = vm.setUserProperties(bidderUrl = value)
+    var publisherUrl: String? = null
+        set(value) = vm.setUserProperties(publisherUrl = value)
     var timezone: Int? = null
         set(value) = vm.setUserProperties(timezone = value)
     var location: String? = null
@@ -180,6 +187,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
             adTagId = attributes.getString(R.styleable.AdHashView_adTagId)
             adOrder = attributes.getInteger(R.styleable.AdHashView_adOrder, 0)
             analyticsUrl = attributes.getString(R.styleable.AdHashView_analyticsUrl)
+            bidderUrl = attributes.getString(R.styleable.AdHashView_bidderURL)
+            publisherUrl = attributes.getString(R.styleable.AdHashView_publisherURL)
             adHashUrl = attributes.getString(R.styleable.AdHashView_adHashUrl)
             timezone = attributes.getInt(R.styleable.AdHashView_timezone, 0)
             location = attributes.getString(R.styleable.AdHashView_location)
@@ -208,6 +217,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
                 version = version,
                 adOrder = adOrder,
                 analyticsUrl = analyticsUrl,
+                bidderUrl = bidderUrl,
+                publisherUrl = publisherUrl,
                 timezone = timezone,
                 location = location,
                 screenWidth = screenWidth,
@@ -232,6 +243,8 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
         setOnTouchListener { _, motionEvent ->
             if (motionEvent.action == MotionEvent.ACTION_DOWN) {
                 vm.attachCoordinatesToUri(motionEvent.x, motionEvent.y)
+                vm.addBidderUri()
+                vm.addPublisherUri()
                 openUri()
             }
             true
@@ -241,22 +254,40 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
     private fun handleError(reason: String) {
         Log.e(TAG, "Ad load failed: $reason")
         onError?.invoke(reason)
-        ivAdHash.setImageDrawable(errorDrawable)
+        //ivAdHash.setImageDrawable(errorDrawable)
         ivBlock.visibility = View.GONE
     }
 
     private fun loadAdBitmap(bitmap: Bitmap, recentAd: RecentAd) {
-        ivAdHash.setImageBitmap(bitmap)
-        ivBlock.setImageResource(R.drawable.ic_adhash)
+        vm.getCreativeSize()?.let { size ->
+            Glide.with(ivAdHash).load(bitmap)
+                .apply(
+                    RequestOptions().override(
+                        convertDpToPixel(getWidthFromSize(size), ivAdHash.context),
+                        convertDpToPixel(getHeightFromSize(size), ivAdHash.context)
+                    )
+                )
+                .into(ivAdHash)
+
+        }
+        //ivAdHash.setImageBitmap(bitmap)
+        Glide.with(ivBlock).load(R.drawable.logo_18px).into(ivBlock)
+        //ivBlock.setImageResource(R.drawable.ic_adhash)
         ivBlock.visibility = View.VISIBLE
         vm.onAdDisplayed(recentAd)
     }
+
+    private fun getWidthFromSize(size: String) = size.substringBefore("x").toInt()
+
+    private fun getHeightFromSize(size: String) = size.substringAfter("x").toInt()
+
+    private fun convertDpToPixel(dp: Int, context: Context) = dp * (context.resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
 
     private fun disableAdForVisionImpaired() {
         if (vm.isTalkbackEnabled()) visibility = View.GONE
     }
 
-    private fun openUri() = vm.getUri()?.let { uri ->
+    private fun openUri() = vm.getPublisherUri()?.let { uri ->
         Intent(Intent.ACTION_VIEW)
             .apply { data = uri }
             .also { intent -> context.startActivity(intent) }
@@ -283,7 +314,6 @@ class AdHashView(context: Context, attrs: AttributeSet?) : FrameLayout(context, 
             }
         }
     }
-
 
     override fun onScreenShotTaken(screenshotData: ScreenshotData?) {
         Log.d(TAG, "Screenshot taken")

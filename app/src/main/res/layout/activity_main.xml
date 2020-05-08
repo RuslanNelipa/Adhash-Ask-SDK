@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -17,10 +18,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
             android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp">
+            android:layout_marginEnd="32dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -34,13 +35,14 @@
                 android:layout_height="wrap_content"
                 app:adHashUrl="http://google.com"
                 app:adOrder="1"
+                app:version="1.0"
                 app:adTagId="center"
-                app:analyticsUrl="http://google.com"
+                app:analyticsUrl="https://adhash.org/p/sdk/data.php"
                 app:creativesSize="300x250"
                 app:errorDrawable="@android:drawable/ic_delete"
                 app:loadAdOnStart="true"
                 app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
-                app:screenshotUrl="http://google.com" />
+                app:screenshotUrl="http://google.com"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -54,12 +56,13 @@
                 app:adHashUrl="http://google.com"
                 app:adOrder="1"
                 app:adTagId="center"
-                app:analyticsUrl="http://google.com"
+                app:analyticsUrl="https://adhash.org/p/sdk/data.php?"
                 app:creativesSize="160x600"
                 app:errorDrawable="@android:drawable/ic_delete"
                 app:loadAdOnStart="true"
                 app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
-                app:screenshotUrl="http://google.com" />
+                app:screenshotUrl="http://google.com"
+                app:version="1.0"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -78,7 +81,7 @@
                 app:errorDrawable="@android:drawable/ic_delete"
                 app:loadAdOnStart="true"
                 app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
-                app:screenshotUrl="http://google.com" />
+                app:screenshotUrl="http://google.com"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -96,7 +99,7 @@
                 app:errorDrawable="@android:drawable/ic_delete"
                 app:loadAdOnStart="true"
                 app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
-                app:screenshotUrl="http://google.com" />
+                app:screenshotUrl="http://google.com"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -115,7 +118,7 @@
                 app:errorDrawable="@android:drawable/ic_delete"
                 app:loadAdOnStart="true"
                 app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
-                app:screenshotUrl="http://google.com" />
+                app:screenshotUrl="http://google.com"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -134,7 +137,7 @@
                 app:errorDrawable="@android:drawable/ic_delete"
                 app:loadAdOnStart="true"
                 app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
-                app:screenshotUrl="http://google.com" />
+                app:screenshotUrl="http://google.com"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -153,7 +156,7 @@
                 app:errorDrawable="@android:drawable/ic_delete"
                 app:loadAdOnStart="true"
                 app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
-                app:screenshotUrl="http://google.com" />
+                app:screenshotUrl="http://google.com"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -172,13 +175,11 @@
                 app:errorDrawable="@android:drawable/ic_delete"
                 app:loadAdOnStart="true"
                 app:publisherId="0x89c430444df3dc8329aba2c409770fa196b65d3c"
-                app:screenshotUrl="http://google.com" />
+                app:screenshotUrl="http://google.com"/>
 
         </LinearLayout>
 
-
     </ScrollView>
-
 
     <Button
         android:id="@+id/showBtn"
@@ -190,7 +191,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.95"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <Button
         android:id="@+id/setPropertyBtn"
@@ -200,7 +201,7 @@
         android:layout_marginBottom="16dp"
         android:text="Set property"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -211,7 +212,7 @@
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="parent" />
+        app:layout_constraintTop_toBottomOf="parent"/>
 
     <TextView
         android:id="@+id/errorTv"
@@ -222,6 +223,6 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

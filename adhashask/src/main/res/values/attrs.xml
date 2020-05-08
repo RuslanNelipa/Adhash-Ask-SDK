@@ -8,6 +8,9 @@
         <attr name="adTagId" format="string" />
         <attr name="adOrder" format="integer" />
         <attr name="analyticsUrl" format="string" />
+        <attr name="bidderURL" format="string" />
+        <attr name="publisherURL" format="string" />
+        <attr name="adHashUrl" format="string" />
         <attr name="timezone" format="integer" />
         <attr name="location" format="string" />
         <attr name="screenWidth" format="integer" />
@@ -22,7 +25,6 @@
         <attr name="orientation" format="string" />
         <attr name="gps" format="string" />
         <attr name="creativesSize" format="string" />
-        <attr name="adHashUrl" format="string" />
         <attr name="loadAdOnStart" format="boolean" />
     </declare-styleable>
 </resources>

@@ -75,6 +75,7 @@ class DataEncryptor(private val gson: Gson) {
             }.run {
                 loadDataWithBaseURL("", prepareData(encrypted = url, key = key), "text/html; charset=utf-8", "UTF-8", "")
             }
+
     }
 
     fun encryptUtf8(uri: Uri?): String? {

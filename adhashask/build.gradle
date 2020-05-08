@@ -75,6 +75,9 @@ dependencies {
     embed 'com.squareup.retrofit2:retrofit:' + retrofitVersion
     embed 'com.squareup.retrofit2:converter-gson:' + retrofitVersion
     embed 'com.squareup.retrofit2:converter-scalars:' + retrofitVersion
+
+    def glideVersion = "4.11.0"
+    embed 'com.github.bumptech.glide:glide:' + glideVersion
 }
 
 if (project.rootProject.file('local.properties').exists()) {

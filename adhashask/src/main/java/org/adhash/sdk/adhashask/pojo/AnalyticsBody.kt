@@ -1,6 +1,7 @@
 package org.adhash.sdk.adhashask.pojo
 
 data class AnalyticsBody(
+    var version: String? = null,
     var adTagId: String? = null,
     var publishedId: String? = null,
     var creativeHash: String? = null,
@@ -29,10 +30,9 @@ data class AnalyticsBody(
 ) {
     fun toQueryMap(): Map<String, String?> {
         return mapOf(
+            "version" to "$version",
             "adTagId" to "$adTagId",
-            "publishedId" to "$publishedId",
-            "adTagId" to "$adTagId",
-            "publishedId" to "$publishedId",
+            "publisherId" to "$publishedId",
             "creativeHash" to "$creativeHash",
             "advertiserId" to "$advertiserId",
             "pageURL" to "$pageURL",

@@ -51,4 +51,8 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:' + retrofitVersion
     implementation 'com.squareup.retrofit2:converter-gson:' + retrofitVersion
     implementation 'com.squareup.retrofit2:converter-scalars:' + retrofitVersion
+
+    def glideVersion = "4.11.0"
+    implementation 'com.github.bumptech.glide:glide:' + glideVersion
+    annotationProcessor 'com.github.bumptech.glide:compiler:' + glideVersion
 }
