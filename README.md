@@ -2,26 +2,15 @@
 
 ### How to add
 
-1. Add latest version of SDK to your app `build.gradle`. 
-
-```xml
- dependencies {
-        implementation 'org.adhash.sdk:adhashsdk:<version>'
-  }
+1. Download local library module dependency [here](https://github.com/altrecipe/Adhash-Ask-SDK/archive/master.zip)
+2. Add it to project tree
+3. Add `implementation project(':adhashask')` to your app's `build.gradle`;
+4. Add `include ':adhashask'` in your `settings.gradle`.
+5. Add Glide to your external libraries:
 ```
+def glideVersion = "4.11.0"
+implementation 'com.github.bumptech.glide:glide:' + glideVersion
 
-2. Latest version [here](https://github.com/RuslanNelipa/Adhash-Ask-SDK/releases "Releases")
-3. SDK uses external libraries. Keep in mind that you don't need to add those to `build.gradle`. You will have to resolve conflicts otherways
-
-```xml
-dependencies{
-    implementation 'com.google.code.gson:gson:2.8.5' //JSON deserealizer
-
-    def retrofitVersion = "2.6.2"
-    implementation 'com.squareup.retrofit2:retrofit:' + retrofitVersion //API calls
-    implementation 'com.squareup.retrofit2:converter-gson:' + retrofitVersion
-    implementation 'com.squareup.retrofit2:converter-scalars:' + retrofitVersion
-}
 ```
 
 ### How to use
